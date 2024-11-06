@@ -13,6 +13,7 @@ package com.mycompany.votingsystem;
 public class VotingSystemMain {
 
     public static void main(String[] args) {
-        frameWaitingPage wait = new frameWaitingPage();
+        frameAdminAccess wait = new frameAdminAccess();
+        wait.setVisible(true);
         }
 }
