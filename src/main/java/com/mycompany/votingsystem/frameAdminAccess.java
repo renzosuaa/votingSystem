@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -34,6 +35,7 @@ public class frameAdminAccess extends JFrame implements ActionListener {
        
     private DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     private DateTimeFormatter formatTime = DateTimeFormatter.ofPattern("HH:mm");
+    private Candidate candidate = new Candidate();
     
     setTimeElection setElection = new setTimeElection();
     
@@ -205,6 +207,7 @@ public class frameAdminAccess extends JFrame implements ActionListener {
         btnSetElection.addActionListener(this);
         btnSearchCandidate.addActionListener(this);
         
+        updateSummaryTextField();
         
 //        setTimeElection setTime = new setTimeElection();
     }
@@ -229,39 +232,72 @@ public class frameAdminAccess extends JFrame implements ActionListener {
      
         */
         if (e.getSource() == btnAddCandidate){
-
+            if (((txtfAddName.getText() == null || "".equals(txtfAddParty.getText().trim())) || "".equals(txtfAddName.getText().trim())) || txtfAddParty.getText()==null ){
+                JOptionPane.showMessageDialog(null, "Candidate Information is required.", "Error", JOptionPane.WARNING_MESSAGE);
+            } else {
+                if (cmbAddPosition.getSelectedIndex() != 0){
+                    String name = txtfAddName.getText();
+                    String party = txtfAddParty.getText();
+                    String position = (String)cmbAddPosition.getSelectedItem();
+                    candidate.addCandidate(name,party,position);
+                    txtfAddName.setText("");
+                    txtfAddParty.setText("");
+                    cmbAddPosition.setSelectedIndex(0);
+                    updateSummaryTextField();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Select necessary position.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            
         }
         else if (e.getSource() ==btnClearCandidate){
+            txtfAddName.setText("");
+            txtfAddParty.setText("");
+            cmbAddPosition.setSelectedIndex(0);
         }
         
     // Output the name, partylist, and position based on the given ID  
         else if (e.getSource() == btnSearchCandidate){
+            String i = txtfRemoveID.getText();
+            if (!i.trim().equals("")){      
+            try{
+                int ID = Integer.parseInt(i);
+                //search for the name,partylist,and position of the given ID on the database
+                txtfRemoveName.setText(candidate.getCandidateName(ID));
+                txtfRemoveParty.setText(candidate.getCandidateParty(ID));
+                txtfRemovePosition.setText(candidate.getCandidatePosition(ID));
+                txtfRemoveID.setText("");
+            }catch(NumberFormatException ex){
+                //Error Message if the Format of the ID is Invalid
+                JOptionPane.showMessageDialog(null, "Invalid ID");
+            }                  
+            }
+            else {
+                txtfRemoveID.setText("");
+                JOptionPane.showMessageDialog(null, "Input ID First");  
+            }
         }
         
         else if (e.getSource() == btnRemoveCandidate){
-            try {
-                
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/votingsystemdatabase","root","renzo072");
-                     PreparedStatement ps = con.prepareStatement("delete from votingsystemdatabase.candidates where ID=" + txtfRemoveID.getText())) {
-                    ps.executeUpdate();
-                }
-                
-            //Error Message when the user don't input any ID
-                if (txtfRemoveID.getText().trim().equals("")){
-                    txtfRemoveName.setText("Deleted Successfully");
+            
+            if (!txtfRemoveID.getText().equals("")){  
+                try{
+                    int ID = Integer.parseInt(txtfRemoveID.getText());
+            // ** will later solve how to implement an error message if the ID does not exist in the data base **          
+                    txtfRemoveName.setText("");
                     txtfRemoveParty.setText("");
                     txtfRemovePosition.setText("");
-                }
-            // ** will later solve how to implement an error message if the ID does not exist in the data base **
-                
-                txtfRemoveName.setText("Deleted Successfully");
-                txtfRemoveParty.setText("");
-                txtfRemovePosition.setText("");
-                
-               
-            } catch (ClassNotFoundException | SQLException ex) {
-                Logger.getLogger(frameAdminAccess.class.getName()).log(Level.SEVERE, null, ex);
+                    candidate.deleteCandidate(ID);
+                    txtfRemoveID.setText("");
+                    updateSummaryTextField();    
+            }catch(NumberFormatException ex){
+                txtfRemoveID.setText("");
+                //Error Message if the Format of the ID is Invalid
+                JOptionPane.showMessageDialog(null, "Invalid ID");   
+            }  
+            } else{
+                JOptionPane.showMessageDialog(null, "Enter ID First");
+                txtfRemoveID.setText("");
             }        
         }
       
@@ -306,9 +342,7 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                     
                 }else{
                    JOptionPane.showMessageDialog(null, "Date entered for Election is invalid.","Error",JOptionPane.ERROR_MESSAGE);
-               }
-               
-               
+               } 
             }else{
                JOptionPane.showMessageDialog(this, "Date of Election Required.","Error",JOptionPane.ERROR_MESSAGE);
                 }
@@ -318,5 +352,14 @@ public class frameAdminAccess extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Set Date or Time does not follow the format","Error",JOptionPane.ERROR_MESSAGE);
        }
         }
+    
+    //Function used to show the list of candidates on different position by appending their names on the summary (text area)
+    void updateSummaryTextField(){
+        
+        txtaSummary.setText("President \n \n");
+        txtaSummary.append(candidate.positionParticipantsString("President") + "\n");
+        txtaSummary.append("Vice President \n \n");
+        txtaSummary.append(candidate.positionParticipantsString("Vice President"));      
+    }
       
    }
