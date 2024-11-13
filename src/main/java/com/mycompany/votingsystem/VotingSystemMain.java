@@ -13,7 +13,7 @@ package com.mycompany.votingsystem;
 public class VotingSystemMain {
 
     public static void main(String[] args) {
-        frameAdminAccess wait = new frameAdminAccess();
-        wait.setVisible(true);
+        frameRegistration fr = new frameRegistration();
+        fr.setVisible(true);
         }
 }
