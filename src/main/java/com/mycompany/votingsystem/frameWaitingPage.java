@@ -35,7 +35,6 @@ public class frameWaitingPage extends JFrame implements ActionListener{
         
        btnSignOut.addActionListener(this);
               
-        setVisible(true);
     }   
 
     @Override
