@@ -106,7 +106,7 @@ public class frameLogin extends JFrame {
         btnCreateAccount.setBounds(450, 375, 150, 50);
         btnCreateAccount.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new CreateAccountFrame();
+                new createAccountFrame();
             }
         });
         add(btnCreateAccount);
@@ -150,7 +150,7 @@ public class frameLogin extends JFrame {
 
     
     // Registration Form 
-    class CreateAccountFrame extends JFrame {
+    class createAccountFrame extends JFrame {
         private JLabel lblCreate, lblEmail, lblFirstName, lblMiddleName, lblLastName, lblBirthday, 
                        lblMonth, lblDay, lblYear, lblGender, lblPassword, lblConfirmPassword;
         private JTextField txtEmail, txtFirstName, txtMiddleName, txtLastName, txtMonth, txtDay,
@@ -159,7 +159,7 @@ public class frameLogin extends JFrame {
         private JPasswordField txtPassword, txtConfirmPassword;
         
 
-        CreateAccountFrame() {
+        createAccountFrame() {
             setSize(800, 600);
             setLayout(null);
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

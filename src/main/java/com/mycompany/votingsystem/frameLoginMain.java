@@ -7,7 +7,9 @@ package com.mycompany.votingsystem;
 /**
  *
  * @author lastr
+ * 
  */
+
 public class frameLoginMain {
     public static void main(String[] args){
         new frameLogin();
