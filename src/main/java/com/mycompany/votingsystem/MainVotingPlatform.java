@@ -15,6 +15,8 @@ public class MainVotingPlatform {
      */
     public static void main(String[] args) {
         new VotingPlatform();
+        
+        
     }
     
 }
