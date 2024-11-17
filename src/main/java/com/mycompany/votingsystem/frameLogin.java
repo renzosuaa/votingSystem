@@ -9,6 +9,7 @@ package com.mycompany.votingsystem;
  * @author lastr
  */
 
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,7 +23,7 @@ import java.time.LocalDate;
 
 
 
-public class LogIn_Registration extends JFrame {
+public class frameLogin extends JFrame {
 
     private JLabel lblEmail, lblPassword;
     private JTextField txtEmail;
@@ -35,12 +36,13 @@ public class LogIn_Registration extends JFrame {
     static final String PASSWORD = "aiellogabriel11924lastrella"; 
 
 
-    LogIn_Registration() {
+    frameLogin() {
 
         setSize(800, 600);
         setLayout(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        
+ 
         
         lblEmail = new JLabel("Email: ");
         lblEmail.setBounds(375, 110, 80, 50);
@@ -70,7 +72,7 @@ public class LogIn_Registration extends JFrame {
                 
                 if ("admin01@gmail.com".equals(email) && "admin0123".equals(password)) {
                     JOptionPane.showMessageDialog(btnLogin, "Login successful!");
-                    new adminAccess(); 
+                    new frameAdminAccess(); 
                     dispose(); 
                 } else {
     
@@ -331,7 +333,7 @@ public class LogIn_Registration extends JFrame {
 
                    
                     // Para sure kung wala pang katulad yung email ssa Database
-                    try (Connection connection = DriverManager.getConnection(LogIn_Registration.URL, LogIn_Registration.USER, LogIn_Registration.PASSWORD)) {
+                    try (Connection connection = DriverManager.getConnection(frameLogin.URL, frameLogin.USER, frameLogin.PASSWORD)) {
                        String query = "SELECT COUNT(*) FROM login.registration WHERE email = ?";
                        PreparedStatement preparedStatement = connection.prepareStatement(query);
                        preparedStatement.setString(1, email);
@@ -351,7 +353,7 @@ public class LogIn_Registration extends JFrame {
                     // Para ma-insert yung data sa Database
                     try {
                         int id = createID(); 
-                        Connection connection = DriverManager.getConnection(LogIn_Registration.URL, LogIn_Registration.USER, LogIn_Registration.PASSWORD);
+                        Connection connection = DriverManager.getConnection(frameLogin.URL, frameLogin.USER, frameLogin.PASSWORD);
                         
                         String query = "INSERT INTO login.registration (id, email, firstname, middlename, lastname,"
                                 + "birthday, gender, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -401,7 +403,7 @@ public class LogIn_Registration extends JFrame {
         // Para may specif na ID per users (not sure yet in this part, but working totally fine)
         private int createID() {
             String query = "SELECT COALESCE(MAX(id), 0) + 1 FROM login.registration";
-            try (Connection connection = DriverManager.getConnection(LogIn_Registration.URL, LogIn_Registration.USER, LogIn_Registration.PASSWORD);
+            try (Connection connection = DriverManager.getConnection(frameLogin.URL, frameLogin.USER, frameLogin.PASSWORD);
                  PreparedStatement preparedStatement = connection.prepareStatement(query);
                  ResultSet info = preparedStatement.executeQuery()) {
 

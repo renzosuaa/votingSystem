@@ -8,9 +8,9 @@ package com.mycompany.votingsystem;
  *
  * @author lastr
  */
-public class LogIn_RegistrationMain {
+public class frameLoginMain {
     public static void main(String[] args){
-        new LogIn_Registration();
+        new frameLogin();
     
     }
 }
