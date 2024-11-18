@@ -11,8 +11,8 @@ import static java.awt.image.ImageObserver.HEIGHT;
 
 public class VotingPlatform extends JFrame implements ActionListener {
     
-    private JLabel lblCandidatename,lblCandidateid,lblPres,lblVpres,lblSenators;
-    private JScrollPane Mainscrollpane,Innerscrollpane1,Innerscrollpane2,Innerscrollpane3;
+    private JLabel lblCandidateName,lblCandidateId,lblPres,lblVpres,lblSenators;
+    private JScrollPane MainScrollPane,InnerScrollPane1,InnerScrollPane2,InnerScrollPane3;
     private JPanel Mainpanel;
     private JButton btnSubmit,btnSignOut;
 
@@ -51,24 +51,24 @@ public class VotingPlatform extends JFrame implements ActionListener {
            
             //scrollpane
             
-            Innerscrollpane1 = new JScrollPane(Mainscrollpane);
-            Innerscrollpane1.setBounds(100,156,550,70);
-            add(Innerscrollpane1);
+            InnerScrollPane1 = new JScrollPane(MainScrollPane);
+            InnerScrollPane1.setBounds(100,156,550,70);
+            add(InnerScrollPane1);
             
-            Innerscrollpane2 = new JScrollPane(Mainscrollpane);
-            Innerscrollpane2.setBounds(100,268,550,80);
-            add(Innerscrollpane2);
+            InnerScrollPane2 = new JScrollPane(MainScrollPane);
+            InnerScrollPane2.setBounds(100,268,550,80);
+            add(InnerScrollPane2);
             
-            Innerscrollpane3 = new JScrollPane(Mainscrollpane);
-            Innerscrollpane3.setBounds(100,390,553,85);
-            add(Innerscrollpane3);
+            InnerScrollPane3 = new JScrollPane(MainScrollPane);
+            InnerScrollPane3.setBounds(100,390,553,85);
+            add(InnerScrollPane3);
             
             
-            Mainscrollpane = new JScrollPane(Mainpanel);
-            Mainscrollpane.setBounds(50,100, 680, 400);
+            MainScrollPane = new JScrollPane(Mainpanel);
+            MainScrollPane.setBounds(50,100, 680, 400);
             //mainscrollpane.setBackground(Color.GRAY);
             //mainscrollpane.getViewport().setBackground(Color.LIGHT_GRAY);
-            add(Mainscrollpane);
+            add(MainScrollPane);
             
             
             
@@ -76,15 +76,15 @@ public class VotingPlatform extends JFrame implements ActionListener {
             
             
             
-            lblCandidatename = new JLabel("Candidates Name");
-            lblCandidatename.setFont(new Font("Arial",Font.BOLD,25));
-            lblCandidatename.setBounds(30,30,700,30);
-            add(lblCandidatename);
+            lblCandidateName = new JLabel("Candidates Name");
+            lblCandidateName.setFont(new Font("Arial",Font.BOLD,25));
+            lblCandidateName.setBounds(30,30,700,30);
+            add(lblCandidateName);
             
-            lblCandidatename = new JLabel("Candidate_ID");
-            lblCandidatename.setFont(new Font("Arial",Font.BOLD,15));
-            lblCandidatename.setBounds(40,60,700,30);
-            add(lblCandidatename);
+            lblCandidateId = new JLabel("Candidate_ID");
+            lblCandidateId.setFont(new Font("Arial",Font.BOLD,15));
+            lblCandidateId.setBounds(40,60,700,30);
+            add(lblCandidateId);
             
             //button
             
