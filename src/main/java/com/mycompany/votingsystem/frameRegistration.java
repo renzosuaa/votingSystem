@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import javax.swing.SwingConstants;
 
+    // MARC LAURENCE A. LUNA
 public class frameRegistration extends JFrame {
 
     // UI components
