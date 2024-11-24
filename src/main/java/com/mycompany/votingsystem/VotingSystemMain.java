@@ -13,7 +13,9 @@ package com.mycompany.votingsystem;
 public class VotingSystemMain {
 
     public static void main(String[] args) {
-        frameAdminAccess wait = new frameAdminAccess();
-        wait.setVisible(true);
+        frameWaitingPage fw = new frameWaitingPage();
+        frameAdminAccess fa = new frameAdminAccess();
+        frameRegistration fr = new frameRegistration();
+        fa.setVisible(true);
         }
 }
