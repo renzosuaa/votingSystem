@@ -29,7 +29,7 @@ public class frameLogin extends JFrame {
     private JLabel lblEmail, lblPassword;
     private JTextField txtEmail;
     private JPasswordField txtPassword;
-    private JButton btnLogin, btnCreateAccount;
+    private JButton btnLogin, btnRegister;
 
     
     // for Database
@@ -44,7 +44,7 @@ public class frameLogin extends JFrame {
         setLayout(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        
+        // for Email
         lblEmail = new JLabel("Email: ");
         lblEmail.setBounds(375, 110, 80, 50);
         add(lblEmail);
@@ -53,7 +53,7 @@ public class frameLogin extends JFrame {
         txtEmail.setBounds(375, 150, 300, 50);
         add(txtEmail);
 
-        
+        // for Password
         lblPassword = new JLabel("Password: ");
         lblPassword.setBounds(375, 200, 80, 50);
         add(lblPassword);
@@ -62,7 +62,8 @@ public class frameLogin extends JFrame {
         txtPassword.setBounds(375, 240, 300, 50);
         add(txtPassword);
 
-        
+        /* Function of Login Button. Admin will be redirected to frameAdmin if specific email and password were used.
+        Then voters need to register first to be able to enter the voting frame*/
         btnLogin = new JButton("Login");
         btnLogin.setBounds(375, 310, 300, 50);
         btnLogin.addActionListener(new ActionListener() {
@@ -70,13 +71,14 @@ public class frameLogin extends JFrame {
                 String email = txtEmail.getText();
                 String password = new String(txtPassword.getPassword());
 
-                
+                // example of specific email and password for Admin
                 if ("admin01@gmail.com".equals(email) && "admin0123".equals(password)) {
                     JOptionPane.showMessageDialog(btnLogin, "Login successful!");
                     new frameAdminAccess(); 
                     dispose(); 
                 } else {
-    
+                    
+                    // function to retrieve data from database so voters could login
                     try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
                         String query = "SELECT * FROM login.registration WHERE email = ? AND password = ?";
                         PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -102,15 +104,15 @@ public class frameLogin extends JFrame {
         });
         add(btnLogin);
 
-        
-        btnCreateAccount = new JButton("Create Account");
-        btnCreateAccount.setBounds(450, 375, 150, 50);
-        btnCreateAccount.addActionListener(new ActionListener() {
+        // button that will redirect voters to registration frame so they could create an account
+        btnRegister = new JButton("Create Account");
+        btnRegister.setBounds(450, 375, 150, 50);
+        btnRegister.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new frameRegistration();
             }
         });
-        add(btnCreateAccount);
+        add(btnRegister);
 
         setVisible(true); 
     }
