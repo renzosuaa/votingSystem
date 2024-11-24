@@ -16,6 +16,7 @@ public class VotingSystemMain {
         frameWaitingPage fw = new frameWaitingPage();
         frameAdminAccess fa = new frameAdminAccess();
         frameRegistration fr = new frameRegistration();
+        frameLogin fl = new frameLogin();
         fa.setVisible(true);
         }
 }
