@@ -22,7 +22,8 @@ public class frameRegistration extends JFrame {
         setSize(800, 600);
         setLayout(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    
+        setLocationRelativeTo(null);
+        
         labelHeader = new JLabel("Welcome! Please Register", SwingConstants.LEFT);
         labelHeader.setBounds(170, 20, 300, 50);
         labelHeader.setFont(new Font ("Arial",Font.BOLD,20));
@@ -31,7 +32,7 @@ public class frameRegistration extends JFrame {
         // Logo
         labelLogo = new JLabel();
         labelLogo.setBounds(525, 50, 200,350); 
-        ImageIcon logoIcon = new ImageIcon("C:\\Users\\NEC\\Downloads\\Commission on Elections.png");
+        ImageIcon logoIcon = new ImageIcon("Commission on Elections.png");
         labelLogo.setIcon(new ImageIcon(logoIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH)));
         add(labelLogo);
         
@@ -143,6 +144,7 @@ public class frameRegistration extends JFrame {
         btnCancel.addActionListener(e -> {
             dispose(); // Close the registration frame
             JOptionPane.showMessageDialog(this, "Returning to Login Page", "Info", JOptionPane.INFORMATION_MESSAGE);
+            new frameLogin().setVisible(true);
  
         });
     }
@@ -158,7 +160,7 @@ public class frameRegistration extends JFrame {
         if (!password.equals(confirmPassword)) {
             JOptionPane.showMessageDialog(this, "Passwords do not match!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
-        }
+        } 
 
         int birthMonth, birthDay, birthYear;
         try {

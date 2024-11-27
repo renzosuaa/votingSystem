@@ -44,6 +44,7 @@ public class frameAdminAccess extends JFrame implements ActionListener {
         setSize(800,600);
         setLayout(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
         
 //Adding Components
         hdrAdmin = new JLabel("Admin Page");
@@ -213,23 +214,6 @@ public class frameAdminAccess extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        
-        /*
-        btnAddCandidate    - Add named candidate along with their partlist and position to the voting system database using 
-                           - This button does not work if one in txtfAddName and txtfAddParty is not filled
-        
-        btnDeleteCandidate - Delete named candidate along with their data on the database using their ID 
-                           - Enters a error message if the txtfIDRemove have no value or the ID presented does not exist on the database
-        
-        btnClearCandidate  - clear txtfAddName and txtfAddParty, and set index of cmbAddPosition to 0
-        
-        btnSearchCandidate - Search get the information (name,position, and partylist) of the candidate using their ID
-        
-        btnCurrentTime     - Get the current date and time
-        
-        btnSignOut         - dispose this frame
-     
-        */
         if (e.getSource() == btnAddCandidate){
                 if (((txtfAddName.getText() == null || "".equals(txtfAddParty.getText().trim())) || "".equals(txtfAddName.getText().trim())) || txtfAddParty.getText()==null ){
                     JOptionPane.showMessageDialog(null, "Candidate Information is required.", "Error", JOptionPane.WARNING_MESSAGE);
@@ -313,6 +297,7 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                 int resultSignOut = JOptionPane.showConfirmDialog(this, "Are you sure you want to leave the Admin Page?", "Log Out", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
                 if (resultSignOut == JOptionPane.YES_OPTION){
                     dispose();   
+                    new frameLogin().setVisible(true);
                 } 
         }
         
@@ -323,11 +308,31 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                         LocalDateTime ldtStartDateTime = LocalDateTime.parse(StartDateTime,DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm"));
                         String EndDateTime = txtfDateEndElection.getText().trim()+" "+txtfTimeEndElection.getText().trim();
                         LocalDateTime ldtEndDateTime = LocalDateTime.parse(EndDateTime,DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm"));
+                        
                         //checks whether the election dates are correct (End date is farther than Start date; is not same)
                         if(timec.isStartBeforeEnd(ldtStartDateTime,ldtEndDateTime)){
+                            try{
+                            Class.forName("com.mysql.cj.jdbc.Driver");
+                            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","Andurehhh619");
+                            PreparedStatement psClear = con.prepareStatement("Truncate Table dbvotingsystem.electiondate");
+                            psClear.execute();
+                            PreparedStatement ps = con.prepareStatement("Insert into electiondate (startDateTime, endDateTime) values (?,?)");
+                            ps.setString(1,StartDateTime);
+                            ps.setString(2,EndDateTime);
+                            ps.execute();
+                            con.close();
+                            
+                            
+                        } catch (ClassNotFoundException | SQLException ex) {
+                            Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);   
+                        }
+                            
+                            
+                            
                             //Checks whether the Election is able to 
                                 if(timec.isWithinTime(ldtStartDateTime,ldtEndDateTime)){
-                                        ElectionOn = true;
+                                        //ElectionOn = timec.isWithinTime(ldtStartDateTime, ldtEndDateTime);
+                                        
                                         System.out.println("Time in");
                                 }
                                 else{
