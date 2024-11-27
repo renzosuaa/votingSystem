@@ -115,7 +115,6 @@ public class frameVoting extends JFrame implements ActionListener {
         } else if (e.getSource() == btnSignOut) {
             JOptionPane.showMessageDialog(this, "Thank You for Voting Wisely !", "Voting Guide", JOptionPane.INFORMATION_MESSAGE);
             dispose();
-            new frameLogin().setVisible(true);
         }
     }
     
