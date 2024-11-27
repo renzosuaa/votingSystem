@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.*;
 import static java.awt.image.ImageObserver.HEIGHT;
 
-public class VotingPlatform extends JFrame implements ActionListener {
+public class frameVoting extends JFrame implements ActionListener {
     
     private JLabel lblCandidateName,lblCandidateId,lblPres,lblVpres,lblSenators;
     private JScrollPane MainScrollPane,InnerScrollPane1,InnerScrollPane2,InnerScrollPane3;
@@ -17,7 +17,7 @@ public class VotingPlatform extends JFrame implements ActionListener {
     private JButton btnSubmit,btnSignOut;
 
     
-    VotingPlatform(){
+    frameVoting(){
     
        
         
