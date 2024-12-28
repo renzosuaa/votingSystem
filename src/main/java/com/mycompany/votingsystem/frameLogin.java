@@ -1,14 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.votingsystem;
 
-/**
- *
- * @author lastr
- */
-
+//Aiello Gabriel B. Lastrella
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -18,13 +10,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.DateTimeException;
-import java.time.LocalDate;
+/*import java.time.DateTimeException;
+import java.time.LocalDate;*/
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 
 public class frameLogin extends JFrame {
@@ -111,28 +102,29 @@ public class frameLogin extends JFrame {
                     }
                     //time.isWithinTime(LocalDateTime.MIN, LocalDateTime.MIN)
                     // function to retrieve data from database so voters could login
-//                    try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-//                        String query = "SELECT * FROM login.registration WHERE email = ? AND password = ?";
-//                        PreparedStatement preparedStatement = connection.prepareStatement(query);
-//                        preparedStatement.setString(1, email);
-//                        preparedStatement.setString(2, password);
-//
-//                        ResultSet set = preparedStatement.executeQuery();
-//                        if (set.next()) {
-//                            JOptionPane.showMessageDialog(btnLogin, "Login successful!");
-//                            new frameVoting();
+                    
+                    try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
+                        String query = "SELECT * FROM login.registration WHERE email = ? AND password = ?";
+                        PreparedStatement preparedStatement = connection.prepareStatement(query);
+                        preparedStatement.setString(1, email);
+                        preparedStatement.setString(2, password);
+
+                        ResultSet set = preparedStatement.executeQuery();
+                        if (set.next()) {
+                            JOptionPane.showMessageDialog(btnLogin, "Login successful!");
+                            new frameVoting();
                   
-//                            dispose();
-//                        } else {
-//                            JOptionPane.showMessageDialog(btnLogin, "Invalid username or password.",
-//                                    "Login Error", JOptionPane.ERROR_MESSAGE);
-//                        }
-//                    } catch (Exception ex) {
-//                        ex.printStackTrace();
-//                        JOptionPane.showMessageDialog(btnLogin, "An error occurred during authentication.",
-//                                "Error", JOptionPane.ERROR_MESSAGE);
-//                    }
-                   // if(time)
+                            dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(btnLogin, "Invalid username or password.",
+                                    "Login Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(btnLogin, "An error occurred during authentication.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                   
                 }
             }
         });
