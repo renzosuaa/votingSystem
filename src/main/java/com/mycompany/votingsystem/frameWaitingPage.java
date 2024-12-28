@@ -17,6 +17,7 @@ public class frameWaitingPage extends JFrame implements ActionListener{
         setSize(800,600);
         setLayout(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
         
         hdrClosed = new JLabel("The election is yet to be opened.",SwingConstants.CENTER);
         hdrClosed.setFont(new Font("Roboto", Font.BOLD,25));
@@ -35,7 +36,6 @@ public class frameWaitingPage extends JFrame implements ActionListener{
         
        btnSignOut.addActionListener(this);
               
-        setVisible(true);
     }   
 
     @Override
@@ -43,6 +43,7 @@ public class frameWaitingPage extends JFrame implements ActionListener{
         
     if(e.getSource()==btnSignOut){
         dispose();
+        new frameLogin();
     }
         
     }
