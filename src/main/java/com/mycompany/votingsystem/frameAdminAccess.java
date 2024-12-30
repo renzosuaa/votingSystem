@@ -221,8 +221,8 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                     if (cmbAddPosition.getSelectedIndex() != 0){
                         String name = txtfAddName.getText();
                         String party = txtfAddParty.getText();
-                        String position = (String)cmbAddPosition.getSelectedItem();
-                        candidate.addCandidate(name,party,position);
+                        String candidatePosition = (String)cmbAddPosition.getSelectedItem();
+                        candidate.addCandidate(name,party,candidatePosition);
                         txtfAddName.setText("");
                         txtfAddParty.setText("");
                         cmbAddPosition.setSelectedIndex(0);
@@ -231,7 +231,6 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                         JOptionPane.showMessageDialog(null, "Select necessary position.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
-            
         }
         else if (e.getSource() ==btnClearCandidate){
             txtfAddName.setText("");
@@ -243,17 +242,18 @@ public class frameAdminAccess extends JFrame implements ActionListener {
         else if (e.getSource() == btnSearchCandidate){
                 String i = txtfRemoveID.getText();
                 if (!i.trim().equals("")){      
-                try{
-                    int ID = Integer.parseInt(i);
-                    //search for the name,partylist,and position of the given ID on the database
-                    txtfRemoveName.setText(candidate.getCandidateName(ID));
-                    txtfRemoveParty.setText(candidate.getCandidateParty(ID));
-                    txtfRemovePosition.setText(candidate.getCandidatePosition(ID));
-                    txtfRemoveID.setText("");
-                }catch(NumberFormatException ex){
-                    //Error Message if the Format of the ID is Invalid
-                    JOptionPane.showMessageDialog(null, "Invalid ID");
-                }                  
+                    try{
+                        int ID = Integer.parseInt(i);
+                        //search for the name,partylist,and position of the given ID on the database
+                        Candidate candidates = new Candidate(ID);
+                        txtfRemoveName.setText(candidates.name);
+                        txtfRemoveParty.setText(candidates.partylist);
+                        txtfRemovePosition.setText(candidates.position);
+
+                    }catch(NumberFormatException ex){
+                        //Error Message if the Format of the ID is Invalid
+                        JOptionPane.showMessageDialog(null, "Invalid ID");
+                    }                  
                 }
                 else {
                     txtfRemoveID.setText("");
@@ -292,7 +292,7 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                 String formattedCurrTime = currTime.format(DateTimeFormatter.ofPattern("HH:mm"));
                 txtfTimeStartElection.setText(formattedCurrTime);
         }
-        
+      
         else if(e.getSource() == btnSignOut){
                 int resultSignOut = JOptionPane.showConfirmDialog(this, "Are you sure you want to leave the Admin Page?", "Log Out", JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
                 if (resultSignOut == JOptionPane.YES_OPTION){
@@ -302,57 +302,14 @@ public class frameAdminAccess extends JFrame implements ActionListener {
         }
         
         else if(e.getSource()==btnSetElection){
-               if(!txtfDateEndElection.getText().isBlank() && !txtfTimeEndElection.getText().isBlank() && !txtfDateStartElection.getText().isBlank() && !txtfDateStartElection.getText().isBlank()){
-               try{
-                        String StartDateTime = txtfDateStartElection.getText().trim()+" "+txtfTimeStartElection.getText().trim();
-                        LocalDateTime ldtStartDateTime = LocalDateTime.parse(StartDateTime,DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm"));
-                        String EndDateTime = txtfDateEndElection.getText().trim()+" "+txtfTimeEndElection.getText().trim();
-                        LocalDateTime ldtEndDateTime = LocalDateTime.parse(EndDateTime,DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm"));
-                        
-                        //checks whether the election dates are correct (End date is farther than Start date; is not same)
-                        if(timec.isStartBeforeEnd(ldtStartDateTime,ldtEndDateTime)){
-                            try{
-                            Class.forName("com.mysql.cj.jdbc.Driver");
-                            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","Andurehhh619");
-                            PreparedStatement psClear = con.prepareStatement("Truncate Table dbvotingsystem.electiondate");
-                            psClear.execute();
-                            PreparedStatement ps = con.prepareStatement("Insert into electiondate (startDateTime, endDateTime) values (?,?)");
-                            ps.setString(1,StartDateTime);
-                            ps.setString(2,EndDateTime);
-                            ps.execute();
-                            con.close();
-                            
-                            
-                        } catch (ClassNotFoundException | SQLException ex) {
-                            Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);   
-                        }
-                            
-                            
-                            
-                            //Checks whether the Election is able to 
-                                if(timec.isWithinTime(ldtStartDateTime,ldtEndDateTime)){
-                                        //ElectionOn = timec.isWithinTime(ldtStartDateTime, ldtEndDateTime);
-                                        
-                                        System.out.println("Time in");
-                                }
-                                else{
-                                System.out.println("Time out");
-                                }
-                                JOptionPane.showMessageDialog(this, "Election dates set, and is now running.", "Date and Time Confirmed", JOptionPane.INFORMATION_MESSAGE);
-                        }
-                                else{
-                                JOptionPane.showMessageDialog(null, "Date entered is invalid. Please enter valid date and time.","Error",JOptionPane.ERROR_MESSAGE);
-                                
-                                }
-                    
-                }
-                catch(DateTimeException er){
-                        JOptionPane.showMessageDialog(null, "Date entered is invalid. Please follow the correct format: \nDate: MM/dd/yyyy \nTime: HH:mm","Error",JOptionPane.ERROR_MESSAGE);
-                }
-                }
-                else{
-                        JOptionPane.showMessageDialog(this, "Date of Election Required.","Error",JOptionPane.ERROR_MESSAGE);
-                } 
+            if(!txtfDateEndElection.getText().isBlank() && !txtfTimeEndElection.getText().isBlank() && !txtfDateStartElection.getText().isBlank() && !txtfDateStartElection.getText().isBlank()){
+                String StartDateTime = txtfDateStartElection.getText().trim()+" "+txtfTimeStartElection.getText().trim();   
+                String EndDateTime = txtfDateEndElection.getText().trim()+" "+txtfTimeEndElection.getText().trim();
+                timec.setTime(StartDateTime, EndDateTime);
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "Date of Election Required.","Error",JOptionPane.ERROR_MESSAGE);
+            } 
         }
        
         else if(e.getSource()==btnForceEndElection){
@@ -360,19 +317,17 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                 if(confirm == JOptionPane.YES_OPTION){
                         JOptionPane.showMessageDialog(this, "The election has been forcefully halted.","End Election",JOptionPane.INFORMATION_MESSAGE);
                         ElectionOn = false;
-
-                }
-                
+                }   
         }
-        }
+    }   
     
     //Function used to show the list of candidates on different position by appending their names on the summary (text area)
     void updateSummaryTextField(){
         
         txtaSummary.setText("President \n \n");
-        txtaSummary.append(candidate.positionParticipantsString("President") + "\n");
+        txtaSummary.append(candidate.listOfAllCandidatesInString("President") + "\n");
         txtaSummary.append("Vice President \n \n");
-        txtaSummary.append(candidate.positionParticipantsString("Vice President"));      
+        txtaSummary.append(candidate.listOfAllCandidatesInString("Vice President"));      
     }
       
-   }
+}
