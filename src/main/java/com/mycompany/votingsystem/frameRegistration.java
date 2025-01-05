@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.time.DateTimeException;
 import javax.swing.*;
 import java.time.LocalDate;
-import java.time.Period;
+import java.util.Hashtable;
 import javax.swing.SwingConstants;
 
     
@@ -28,7 +28,9 @@ public class frameRegistration extends JFrame {
     
     static final String URL = "jdbc:mysql://localhost:3306/login";
     static final String USER = "root"; 
-    static final String PASSWORD = "aiellogabriel11924lastrella"; 
+    static final String PASSWORD = "aiellogabriel11924lastrella";
+    
+    private static Hashtable<String, String> userHashTable = new Hashtable<>();
 
     frameRegistration() {
         
@@ -39,7 +41,7 @@ public class frameRegistration extends JFrame {
         setLocationRelativeTo(null);
         
         lblHeader = new JLabel("Welcome! Please Register", SwingConstants.LEFT);
-        lblHeader.setBounds(170, 20, 300, 50);
+        lblHeader.setBounds(190, 20, 300, 50);
         lblHeader.setFont(new Font ("Arial",Font.BOLD,20));
         add(lblHeader);
         
@@ -124,11 +126,12 @@ public class frameRegistration extends JFrame {
         rbtnFemale = new JRadioButton("Female");
         rbtnFemale.setBounds(280, 290, 100, 30);
         add(rbtnFemale);
+        
+        ButtonGroup gGroup = new ButtonGroup();
+        gGroup.add(rbtnMale);
+        gGroup.add(rbtnFemale);
 
-        /*ButtonGroup genderGroup = new ButtonGroup();
-        genderGroup.add(rbtnMale);
-        genderGroup.add(rbtnFemale);*/
-
+      
         // Password
         lblPassword = new JLabel("Password:");
         lblPassword.setBounds(30, 330, 150, 30);
@@ -147,31 +150,21 @@ public class frameRegistration extends JFrame {
 
         // Create Account Button
         btnCreateAccount = new JButton("Create Account");
-        btnCreateAccount.setBounds(180, 420, 130, 30);
+        btnCreateAccount.setBounds(250, 420, 130, 30);
         add(btnCreateAccount);
-        
-        btnCancel = new JButton("Cancel");
-        btnCancel.setBounds(320, 420, 130, 30);
-        add(btnCancel);
         
         btnBack = new JButton("Back");
         btnBack.setBounds(670, 515, 95, 30);
         add(btnBack);
 
         btnCreateAccount.addActionListener(this::createAccount);
-        
-        btnCancel.addActionListener(e -> {
-            dispose(); // Close the registration frame
-            JOptionPane.showMessageDialog(this, "Cancel creating an account?", "Info", JOptionPane.INFORMATION_MESSAGE);
-            new frameLogin().setVisible(true);
- 
-        });
-        
+
         btnBack.addActionListener(e -> {
-            dispose(); // Close the registration frame
-            //JOptionPane.showMessageDialog(this, "Cancel creating an account?", "Info", JOptionPane.INFORMATION_MESSAGE);
-            new frameLogin().setVisible(true);
- 
+            int choice = JOptionPane.showConfirmDialog(this, "You want to get back to Login Page?", "Info", JOptionPane.YES_NO_OPTION);
+            if (choice == JOptionPane.YES_OPTION){
+                    dispose();   
+                    new frameLogin().setVisible(true);
+                } 
         });
     }
     
@@ -193,6 +186,9 @@ public class frameRegistration extends JFrame {
             } else if (rbtnFemale.isSelected()) {
                 gender = "Female";
             }
+            ButtonGroup gGroup = new ButtonGroup();
+            gGroup.add(rbtnMale);
+            gGroup.add(rbtnFemale);
                     
         String password = new String(txtPassword.getPassword());
         String conPassword = new String(txtConfirmPassword.getPassword());                 
@@ -218,7 +214,7 @@ public class frameRegistration extends JFrame {
         try {
             birthday = LocalDate.of(Integer.parseInt(yyyy), Integer.parseInt(mm), Integer.parseInt(dd));
         } catch (DateTimeException ex) {
-            JOptionPane.showMessageDialog(btnCreateAccount, "Birthday must be in numeric form..");
+            JOptionPane.showMessageDialog(btnCreateAccount, "Birthday must be correct.");
             return;
         }
 
@@ -228,7 +224,7 @@ public class frameRegistration extends JFrame {
             int age = present.getYear() - birthday.getYear();
                     
             if (age < 18) {
-                JOptionPane.showMessageDialog(btnCreateAccount, "You are not yet legal toregister.");
+                JOptionPane.showMessageDialog(btnCreateAccount, "You are not yet in legal age to register.");
                 return;
             }
                  
@@ -240,7 +236,7 @@ public class frameRegistration extends JFrame {
             }
 
                    
-        // Para sure kung wala pang katulad yung email ssa Database
+        // Para sure kung wala pang katulad yung email sa Database
         try (Connection connection = DriverManager.getConnection(frameRegistration.URL, frameRegistration.USER, 
                                                                  frameRegistration.PASSWORD)) {
             String query = "SELECT COUNT(*) FROM login.registration WHERE email = ?";
@@ -286,11 +282,15 @@ public class frameRegistration extends JFrame {
             txtBirthMonth.setText("");
             txtBirthDay.setText("");
             txtBirthYear.setText("");
-            rbtnMale.setText("");
-            rbtnFemale.setText("");
+            gGroup.remove(rbtnMale);
+            gGroup.remove(rbtnFemale);
+            rbtnMale.setSelected(false);
+            rbtnFemale.setSelected(false);
             txtPassword.setText("");
             txtConfirmPassword.setText("");
+            
             if (result > 0) {
+                userHashTable.put(email, password);
                 JOptionPane.showMessageDialog(btnCreateAccount, "Account created successfully!");
 
             } else {
@@ -301,10 +301,11 @@ public class frameRegistration extends JFrame {
             exception.printStackTrace();
             JOptionPane.showMessageDialog(btnCreateAccount, "Database error: " + exception.getMessage());
         }
-        //dispose();
+        
 
     }
     
+    // create a unique ID for each users
     private int createID() {
         String query = "SELECT COALESCE(MAX(id), 0) + 1 FROM login.registration";
         try (Connection connection = DriverManager.getConnection(frameRegistration.URL, frameRegistration.USER, frameRegistration.PASSWORD);
@@ -319,5 +320,26 @@ public class frameRegistration extends JFrame {
         }
         return 1;
     }
-           
+    
+    // retrieving data from hash table
+    public static Hashtable<String, String> retrieve_HT() {
+        return userHashTable;
+    }
+    
+    // so database and hash table could share all data
+    public static void data_HT() {
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            String query = "SELECT email, password FROM login.registration";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String email = resultSet.getString("email");
+                String password = resultSet.getString("password");
+                userHashTable.put(email, password);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
