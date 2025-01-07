@@ -26,9 +26,9 @@ public class frameRegistration extends JFrame {
     private JRadioButton rbtnMale, rbtnFemale;
     private JButton btnCreateAccount, btnCancel, btnBack;
     
-    static final String URL = "jdbc:mysql://localhost:3306/login";
+    static final String URL = "jdbc:mysql://localhost:3306/dbvotingsystem";
     static final String USER = "root"; 
-    static final String PASSWORD = "aiellogabriel11924lastrella";
+    static final String PASSWORD = "andre619";
     
     private static Hashtable<String, String> userHashTable = new Hashtable<>();
 
@@ -237,9 +237,9 @@ public class frameRegistration extends JFrame {
 
                    
         // Para sure kung wala pang katulad yung email sa Database
-        try (Connection connection = DriverManager.getConnection(frameRegistration.URL, frameRegistration.USER, 
-                                                                 frameRegistration.PASSWORD)) {
-            String query = "SELECT COUNT(*) FROM login.registration WHERE email = ?";
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            String query = "SELECT COUNT(*) FROM dbvotingsystem.voters WHERE email = ?";
+            //String query = "SELECT COUNT(*) FROM login.registration WHERE email = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, email);
             ResultSet rS = preparedStatement.executeQuery();
@@ -258,10 +258,9 @@ public class frameRegistration extends JFrame {
         // Para ma-insert yung data sa Database
         try {
             int id = createID();
-            Connection connection = DriverManager.getConnection(frameRegistration.URL, frameRegistration.USER, 
-                                                                frameRegistration.PASSWORD);
+            Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
                         
-            String query = "INSERT INTO login.registration (id, email, firstname, middlename, lastname,"
+            String query = "INSERT INTO dbvotingsystem.voters (voterID, email, firstname, middlename, lastname,"
                     + "birthday, gender, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
 
@@ -307,8 +306,8 @@ public class frameRegistration extends JFrame {
     
     // create a unique ID for each users
     private int createID() {
-        String query = "SELECT COALESCE(MAX(id), 0) + 1 FROM login.registration";
-        try (Connection connection = DriverManager.getConnection(frameRegistration.URL, frameRegistration.USER, frameRegistration.PASSWORD);
+        String query = "SELECT COALESCE(MAX(voterID), 0) + 1 FROM dbvotingsystem.voters";
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(query);
              ResultSet info = preparedStatement.executeQuery()) {
 
@@ -329,7 +328,7 @@ public class frameRegistration extends JFrame {
     // so database and hash table could share all data
     public static void data_HT() {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            String query = "SELECT email, password FROM login.registration";
+            String query = "SELECT email, password FROM dbvotingsystem.voters";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
 
             ResultSet resultSet = preparedStatement.executeQuery();

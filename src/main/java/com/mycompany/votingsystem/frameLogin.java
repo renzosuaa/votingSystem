@@ -26,9 +26,9 @@ public class frameLogin extends JFrame implements ActionListener {
     private JButton btnLogin, btnRegister;
 
     // for Database
-    static final String URL = "jdbc:mysql://localhost:3306/login";
+    static final String URL = "jdbc:mysql://localhost:3306/dbvotingsystem";
     static final String USER = "root"; 
-    static final String PASSWORD = "aiellogabriel11924lastrella"; 
+    static final String PASSWORD = "andre619"; 
 
     TimeFuncElection time = new TimeFuncElection();
 
@@ -115,19 +115,8 @@ public class frameLogin extends JFrame implements ActionListener {
             } else {
                 
                 //Checks whether the current time is within the set Election time
-                try{
-                    Class.forName("com.mysql.cj.jdbc.Driver");
-                    Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","Andurehhh619");
-                    PreparedStatement ps = con.prepareStatement("Select startDateTime,endDateTime from dbvotingsystem.electiondate");
-                    ResultSet rs = ps.executeQuery();
-                    if (rs.next()){
-                        String strStartDateTime = rs.getString(1);
-                        System.out.println(strStartDateTime);
-                        LocalDateTime ldtStartDateTime = LocalDateTime.parse(strStartDateTime,DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm"));
-                        String strEndDateTime = rs.getString(2);
-                        LocalDateTime ldtEndDateTime = LocalDateTime.parse(strEndDateTime,DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm"));
-                        con.close();
-                            if(time.isWithinTime(ldtStartDateTime, ldtEndDateTime)){
+                //babaguhinniaiello
+                            if(time.isWithinTime()){
                                 dispose();
                                 new frameVoting().setVisible(true);
                             }
@@ -135,12 +124,7 @@ public class frameLogin extends JFrame implements ActionListener {
                                 dispose();
                                 new frameWaitingPage().setVisible(true);
                             }
-                    }   
-
-                } catch (ClassNotFoundException | SQLException ex) {
-                    Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);   
-                }
-                
+                    }                  
                 
                 // Check if the email and password are in the hash table
                 if (frameRegistration.retrieve_HT().containsKey(email) &&
@@ -151,7 +135,7 @@ public class frameLogin extends JFrame implements ActionListener {
                 } else {
                     // Check if an account is already in database
                     try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-                        String query = "SELECT * FROM login.registration WHERE email = ? AND password = ?";
+                        String query = "SELECT * FROM dbvotingsystem.voters WHERE email = ? AND password = ?";
                         PreparedStatement preparedStatement = connection.prepareStatement(query);
                         preparedStatement.setString(1, email);
                         preparedStatement.setString(2, password);
@@ -173,13 +157,10 @@ public class frameLogin extends JFrame implements ActionListener {
                     }
                 }
             }
-        }
-
+        
         else if (e.getSource() == btnRegister){
             dispose();
             new frameRegistration().setVisible(true);
         } 
     }
 }
-
-    
