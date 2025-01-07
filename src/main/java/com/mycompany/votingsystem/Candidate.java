@@ -1,5 +1,6 @@
 package com.mycompany.votingsystem;
 
+import com.mycompany.votingsystem.idGenerator;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -14,17 +15,22 @@ import javax.swing.JOptionPane;
 public class Candidate {
     String name,partylist,position;
     int candidateID;
-    private String username = "root", password = "renzo072"; 
+     
+    
+   // for Database
+    static final String URL = "jdbc:mysql://localhost:3306/dbvotingsystem";
+    static final String USER = "root"; 
+    static final String PASSWORD = "andre619";  
     
     Candidate(){
         
-    }
+    } 
         // use to access candidate's info using their ID
     Candidate(int ID){
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem",username,password);
-            PreparedStatement ps = con.prepareStatement("Select candidateName,candidateParty, candidatePosition from dbvotingsystem.candidates where candidateID=" + + ID  );
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
+            PreparedStatement ps = con.prepareStatement("Select candidateName,candidateParty, candidatePosition from dbvotingsystem.candidates where candidateID=" + "\""+ ID + "\"");
             ResultSet rs = ps.executeQuery();
             
             if (rs.next()){
@@ -41,7 +47,7 @@ public class Candidate {
         Candidate(String candidateName){
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","renzo072");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
             PreparedStatement ps = con.prepareStatement("Select candidateID,candidateParty,candidatePosition from dbVotingSystem.candidates where candidateName=" + "\"" + candidateName + "\"");
             ResultSet rs = ps.executeQuery();
             
@@ -60,7 +66,7 @@ public class Candidate {
         try {
             String query = "insert into dbvotingsystem.candidates(candidateID,candidateName,candidateParty,candidatePosition) VALUES (?,?,?,?)";
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","renzo072");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
             idGenerator id= new idGenerator();
                     PreparedStatement ps = con.prepareStatement(query);
                         ps.setInt(1,id.idGenerator("dbvotingsystem", "candidates","candidateID"));
@@ -80,7 +86,7 @@ public class Candidate {
         try {      
             Class.forName("com.mysql.cj.jdbc.Driver");
             LinkedList listNames = new LinkedList();
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","renzo072");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
             PreparedStatement ps = con.prepareStatement("Select candidateID from dbvotingsystem.candidates where candidatePosition= " + "\"" +position + "\"");
             ResultSet rs = ps.executeQuery();                    
             while (rs.next()){
@@ -94,18 +100,17 @@ public class Candidate {
     }
     
     //returns the Name, Party, and ID of all Candidates on a certain position -- in String
-    // in the format of candidateID - canddateName   candidateParty
     public String listOfAllCandidatesInString(String position){
         try {
             String names = "";
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","renzo072");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
             PreparedStatement ps = con.prepareStatement("Select candidateID from dbvotingsystem.candidates where candidatePosition=" + "\"" +position + "\"");
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
                 int ID = rs.getInt(1);
                 Candidate candidate = new Candidate(ID);
-                names += ID +" - " +candidate.name+"     " +candidate.partylist + "\n";
+                names += ID +" - " +candidate.name+"\t \t" +candidate.partylist + "\n";
             }   
             return names;  
         } catch (ClassNotFoundException | SQLException ex) {
@@ -118,7 +123,7 @@ public class Candidate {
     public void deleteCandidate(int ID){
         try {           
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","renzo072");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
             PreparedStatement ps = con.prepareStatement("Select candidateName from dbvotingsystem.candidates where candidateID=" + ID);
             ResultSet rs = ps.executeQuery();
             

@@ -39,8 +39,6 @@ public class frameAdminAccess extends JFrame implements ActionListener {
     
     frameAdminAccess(){
         
-        
-        
         setSize(800,600);
         setLayout(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
