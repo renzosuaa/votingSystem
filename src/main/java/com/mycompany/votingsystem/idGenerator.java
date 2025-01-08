@@ -11,14 +11,16 @@ import java.util.logging.Logger;
 
 public class idGenerator{
     private String schema,table;
-    
+    private final String PASSWORD = "andre619";
+        
     int idGenerator(String schema, String table, String IDType) {
         this.schema = schema;
         this.table = table;
         
+        
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/"+schema,"root","renzo072");
+            Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/"+schema,"root",PASSWORD);
             //Make a SQL query to display the current largest ID number
             String query = "select "+ IDType+" from "+ schema +"."+table+" order by "+ IDType +" desc limit 1";
             PreparedStatement ps = con.prepareStatement(query);
