@@ -6,15 +6,6 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class frameLogin extends JFrame implements ActionListener {
@@ -26,9 +17,9 @@ public class frameLogin extends JFrame implements ActionListener {
     private JButton btnLogin, btnRegister;
 
     // for Database
-    static final String URL = "jdbc:mysql://localhost:3306/dbvotingsystem";
+    static final String URL = "jdbc:mysql://localhost:3306/login";
     static final String USER = "root"; 
-    static final String PASSWORD = "andre619"; 
+    static final String PASSWORD = "aiellogabriel11924lastrella"; 
 
     TimeFuncElection time = new TimeFuncElection();
 
@@ -107,60 +98,53 @@ public class frameLogin extends JFrame implements ActionListener {
             String email = txtEmail.getText();
             String password = new String(txtPassword.getPassword());
 
-            // a set admin account and password to access admin frame
-            if ("admin01@gmail.com".equals(email) && "admin0123".equals(password)) {
-                JOptionPane.showMessageDialog(btnLogin, "Login successful!");
+            // FOR ADMINS: retrieve data sa adminAccounts then will be redirected to frameAdminAccess (if details are correct)
+            if (adminAccounts(email, password)) {
+                JOptionPane.showMessageDialog(btnLogin, "Login successful!", " ", JOptionPane.INFORMATION_MESSAGE);
                 new frameAdminAccess().setVisible(true); 
-                dispose(); 
-            } else {
-                
-                //Checks whether the current time is within the set Election time
-                //babaguhinniaiello
-                            if(time.isWithinTime()){
-                                dispose();
-                                new frameVoting().setVisible(true);
-                            }
-                            else{
-                                dispose();
-                                new frameWaitingPage().setVisible(true);
-                            }
-                    }                  
-                
-                // Check if the email and password are in the hash table
-                if (frameRegistration.retrieve_HT().containsKey(email) &&
-                    frameRegistration.retrieve_HT().get(email).equals(password)) {
-                    JOptionPane.showMessageDialog(btnLogin, "Login successful!", "Hash Table", JOptionPane.INFORMATION_MESSAGE);
-                    new frameVoting().setVisible(true);
-                    dispose();
-                } else {
-                    // Check if an account is already in database
-                    try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-                        String query = "SELECT * FROM dbvotingsystem.voters WHERE email = ? AND password = ?";
-                        PreparedStatement preparedStatement = connection.prepareStatement(query);
-                        preparedStatement.setString(1, email);
-                        preparedStatement.setString(2, password);
-
-                        ResultSet set = preparedStatement.executeQuery();
-                        if (set.next()) {
-                            JOptionPane.showMessageDialog(btnLogin, "Login successful!", "Database", JOptionPane.INFORMATION_MESSAGE);
-                            new frameVoting();
-
+                dispose();
+             
+            // FOR USERS: retirve data sa hash table then will be redirected to either frameVoting/Waiting depending on set schedule  
+            } else if (frameRegistration.retrieve_HT().containsKey(email) &&
+                       frameRegistration.retrieve_HT().get(email).equals(password)) {
+                       JOptionPane.showMessageDialog(btnLogin, "Login successful!", "Hash Table", JOptionPane.INFORMATION_MESSAGE);
+                    
+                        //Checks whether the current time is within the set Election time
+                        if(time.isWithinTime()){
                             dispose();
-                        } else {
-                            JOptionPane.showMessageDialog(btnLogin, "Invalid username or password.",
-                                    "Login Error", JOptionPane.ERROR_MESSAGE);
+                            new frameVoting().setVisible(true);
                         }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(btnLogin, "An error occurred during authentication.",
-                                "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
+                        else{
+                            dispose();
+                            new frameWaitingPage().setVisible(true);
+                        }
+                        dispose();
+                    
+            } else {
+                JOptionPane.showMessageDialog(btnLogin, "Email and Password must be correct.", "Error", JOptionPane.ERROR_MESSAGE);  
             }
-        
-        else if (e.getSource() == btnRegister){
+               
+        }else if (e.getSource() == btnRegister){
             dispose();
             new frameRegistration().setVisible(true);
-        } 
+        }
     }
+    
+    // to check if the email and password used in loggin in ay same sa mga naka set na admin accs
+    private boolean adminAccounts(String email, String password) {
+        
+        // List of admin emails & passwords (pwede pa mag-dagdag)
+        String[][] adminAccs = {
+            {"adminTry01@gmail.com", "adminTry01"},
+            {"adminTry02@gmail.com", "adminTry02"},
+            {"adminTry03@gmail.com", "adminTry03"}
+        };
+
+        for (String[] accounts : adminAccs) {
+            if (accounts[0].equals(email) && accounts[1].equals(password)) {
+                return true;
+            }
+        }
+        return false;
+    }  
 }

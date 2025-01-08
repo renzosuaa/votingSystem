@@ -18,7 +18,7 @@ import javax.swing.SwingConstants;
     
 public class frameRegistration extends JFrame {
 
-    // UI components
+    // components
     private JLabel lblHeader,lblLogo, lblCOE, lblOrg, lblEmail, lblFirstName, lblMiddleName, lblLastName, lblBirthday, 
                    lblGender, lblPassword, lblConfirmPassword;
     private JTextField txtEmail, txtFirstName, txtMiddleName, txtLastName, txtBirthMonth, txtBirthDay, txtBirthYear;
@@ -26,11 +26,11 @@ public class frameRegistration extends JFrame {
     private JRadioButton rbtnMale, rbtnFemale;
     private JButton btnCreateAccount, btnCancel, btnBack;
     
-    static final String URL = "jdbc:mysql://localhost:3306/dbvotingsystem";
+    static final String URL = "jdbc:mysql://localhost:3306/login";
     static final String USER = "root"; 
-    static final String PASSWORD = "andre619";
+    static final String PASSWORD = "aiellogabriel11924lastrella";
     
-    private static Hashtable<String, String> userHashTable = new Hashtable<>();
+    private static Hashtable<String, String> users_HT = new Hashtable<>();
 
     frameRegistration() {
         
@@ -64,7 +64,6 @@ public class frameRegistration extends JFrame {
         lblOrg.setFont(new Font ("Arial",Font.BOLD,16));
         add(lblOrg);
         
-
         // Email
         lblEmail = new JLabel("Email:");
         lblEmail.setBounds(30, 90, 150, 30);
@@ -160,11 +159,8 @@ public class frameRegistration extends JFrame {
         btnCreateAccount.addActionListener(this::createAccount);
 
         btnBack.addActionListener(e -> {
-            int choice = JOptionPane.showConfirmDialog(this, "You want to get back to Login Page?", "Info", JOptionPane.YES_NO_OPTION);
-            if (choice == JOptionPane.YES_OPTION){
-                    dispose();   
-                    new frameLogin().setVisible(true);
-                } 
+            new frameLogin().setVisible(true);
+            dispose();     
         });
     }
     
@@ -178,7 +174,7 @@ public class frameRegistration extends JFrame {
         String mm = txtBirthMonth.getText();
         String dd = txtBirthDay.getText();
         String yyyy = txtBirthYear.getText();
-        String birthdayFormat = String.format("%s-%s-%s", mm, dd, yyyy);
+        String birthdayFormat = String.format(mm + "/" + dd + "/" + yyyy);
                     
         String gender = null;
             if (rbtnMale.isSelected()) {
@@ -192,24 +188,29 @@ public class frameRegistration extends JFrame {
                     
         String password = new String(txtPassword.getPassword());
         String conPassword = new String(txtConfirmPassword.getPassword());                 
-                    
-
-        // Para sure kung may laman yung parts ng form
+                 
+        
+            // Para sure kung may laman yung parts ng form
             if (email.isEmpty() || firstName.isEmpty() || middleName.isEmpty() || lastName.isEmpty() || mm.isEmpty() ||
                 dd.isEmpty() || yyyy.isEmpty() || password.isEmpty() || conPassword.isEmpty()) {
                 JOptionPane.showMessageDialog(btnCreateAccount, "Text fields cannot be empty.");
                 return;
             }
                     
-                    
-        // Para sure kung hindi sobra or kulang yung numbers sa birthday
-            if (!mm.matches("\\d{1,2}") || !dd.matches("\\d{1,2}") || !yyyy.matches("\\d{4}")) {
-                JOptionPane.showMessageDialog(btnCreateAccount, "Birthday must be in correct format.");
+            // para sure yung email
+            if (!email.endsWith("@gmail.com") && !email.endsWith("@yahoo.com")) {
+                JOptionPane.showMessageDialog(btnCreateAccount, "Email must be correct.");
+                return;
+            }
+            
+            // Para sure kung hindi sobra or kulang yung numbers sa birthday
+            if (!birthdayFormat.matches("^\\d{2}/\\d{2}/\\d{4}$")) {
+                JOptionPane.showMessageDialog(btnCreateAccount, "Birthday must be in MM/DD/YYYY format.");
                 return;
             }
                     
                     
-        // Para sure kung numeric format yung nilagay sa birthday (based on Luna's work)
+        // Para sure kung numeric format yung nilagay sa birthday
         LocalDate birthday;
         try {
             birthday = LocalDate.of(Integer.parseInt(yyyy), Integer.parseInt(mm), Integer.parseInt(dd));
@@ -218,8 +219,8 @@ public class frameRegistration extends JFrame {
             return;
         }
 
-                    
-        // Para sure kung legal age na (based on Luna's work)
+        
+            // Para sure kung legal age na
             LocalDate present = LocalDate.now();
             int age = present.getYear() - birthday.getYear();
                     
@@ -228,24 +229,43 @@ public class frameRegistration extends JFrame {
                 return;
             }
                  
-                   
-        // Confirm Password (based 'to sa gawa nila Luna)
+            // Confirm Password
             if (!password.equals(conPassword)) {
                 JOptionPane.showMessageDialog(btnCreateAccount, "Passwords do not match.");
                 return;
             }
 
-                   
-        // Para sure kung wala pang katulad yung email sa Database
+        
+        /* check kung meron ng same full name and birthday sa database (kasi diba merong mga people na 
+           may exact same name, so sa birthday nila magv-vary kung same person ba sila or not */
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            String query = "SELECT COUNT(*) FROM dbvotingsystem.voters WHERE email = ?";
-            //String query = "SELECT COUNT(*) FROM login.registration WHERE email = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, email);
-            ResultSet rS = preparedStatement.executeQuery();
+            String query = "SELECT COUNT(*) FROM login.registration WHERE firstname = ? AND middlename = ? AND lastname = ? AND birthday = ?";
+            PreparedStatement pS = connection.prepareStatement(query);
+            pS.setString(1, firstName);
+            pS.setString(2, middleName);
+            pS.setString(3, lastName);
+            pS.setString(4, birthdayFormat);
+            ResultSet rS = pS.executeQuery();
 
             if (rS.next() && rS.getInt(1) > 0) {
-                JOptionPane.showMessageDialog(btnCreateAccount, "Email already exists in the database. Please choose another.");
+                JOptionPane.showMessageDialog(btnCreateAccount, "User already exists.");
+                return;
+            }
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            JOptionPane.showMessageDialog(btnCreateAccount, "Database error: " + exception.getMessage());
+            return;
+        } 
+            
+        // Para sure kung wala pang katulad yung email sa Database
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            String query = "SELECT COUNT(*) FROM login.registration WHERE email = ?";
+            PreparedStatement pS = connection.prepareStatement(query);
+            pS.setString(1, email);
+            ResultSet rS = pS.executeQuery();
+
+            if (rS.next() && rS.getInt(1) > 0) {
+                JOptionPane.showMessageDialog(btnCreateAccount, "Email already registered.");
                 return;
             }
         } catch (Exception exception) {
@@ -253,27 +273,31 @@ public class frameRegistration extends JFrame {
             JOptionPane.showMessageDialog(btnCreateAccount, "Database error: " + exception.getMessage());
             return;
         }
-                    
-                    
-        // Para ma-insert yung data sa Database
+        
+        
+        // connection sa idGenerator class
+        idGenerator idGen = new idGenerator();
+        int id = idGen.idGenerator("login", "registration", "voterid");
+        
+        // Para malagay yung data sa Database
         try {
-            int id = createID();
             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
                         
-            String query = "INSERT INTO dbvotingsystem.voters (voterID, email, firstname, middlename, lastname,"
-                    + "birthday, gender, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            String query = "INSERT INTO login.registration (voterid, email, firstname, middlename, lastname,"
+                                              + "birthday, gender, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement pS = connection.prepareStatement(query);
 
-            preparedStatement.setInt(1, id);
-            preparedStatement.setString(2, email);
-            preparedStatement.setString(3, firstName);
-            preparedStatement.setString(4, middleName);
-            preparedStatement.setString(5, lastName);
-            preparedStatement.setString(6, birthdayFormat);
-            preparedStatement.setString(7, gender);
-            preparedStatement.setString(8, password); 
+            pS.setInt(1, id);
+            pS.setString(2, email);
+            pS.setString(3, firstName);
+            pS.setString(4, middleName);
+            pS.setString(5, lastName);
+            pS.setString(6, birthdayFormat);
+            pS.setString(7, gender);
+            pS.setString(8, password); 
 
-            int result = preparedStatement.executeUpdate();
+            int rS = pS.executeUpdate();
+            
             txtEmail.setText("");
             txtFirstName.setText("");
             txtMiddleName.setText("");
@@ -288,54 +312,38 @@ public class frameRegistration extends JFrame {
             txtPassword.setText("");
             txtConfirmPassword.setText("");
             
-            if (result > 0) {
-                userHashTable.put(email, password);
-                JOptionPane.showMessageDialog(btnCreateAccount, "Account created successfully!");
-
+            if (rS > 0) {
+                users_HT.put(email, password);
+                JOptionPane.showMessageDialog(btnCreateAccount, "Registartion Successful!");
+                dispose();
+                new frameLogin().setVisible(true);
             } else {
-                JOptionPane.showMessageDialog(btnCreateAccount, "Error creating account.");
+                JOptionPane.showMessageDialog(btnCreateAccount, "Error creating an account.");
             }
             connection.close();
+            
         } catch (Exception exception) {
             exception.printStackTrace();
             JOptionPane.showMessageDialog(btnCreateAccount, "Database error: " + exception.getMessage());
         }
-        
-
-    }
-    
-    // create a unique ID for each users
-    private int createID() {
-        String query = "SELECT COALESCE(MAX(voterID), 0) + 1 FROM dbvotingsystem.voters";
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(query);
-             ResultSet info = preparedStatement.executeQuery()) {
-
-            if (info.next()) {
-                return info.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 1;
     }
     
     // retrieving data from hash table
     public static Hashtable<String, String> retrieve_HT() {
-        return userHashTable;
+        return users_HT;
     }
     
-    // so database and hash table could share all data
+    // data sa database will be reloaded in hash table tuwing bubuksan ang app
     public static void data_HT() {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            String query = "SELECT email, password FROM dbvotingsystem.voters";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            String query = "SELECT email, password FROM login.registration";
+            PreparedStatement pS = connection.prepareStatement(query);
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                String email = resultSet.getString("email");
-                String password = resultSet.getString("password");
-                userHashTable.put(email, password);
+            ResultSet rS = pS.executeQuery();
+            while (rS.next()) {
+                String email = rS.getString("email");
+                String password = rS.getString("password");
+                users_HT.put(email, password);
             }
         } catch (SQLException e) {
             e.printStackTrace();
