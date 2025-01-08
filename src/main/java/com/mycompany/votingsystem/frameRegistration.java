@@ -236,7 +236,8 @@ public class frameRegistration extends JFrame {
             }
 
         
-        // Check if the full name already exists in the database
+        /* check kung meron ng same full name and birthday sa database (kasi diba merong mga people na 
+           may exact same name, so sa birthday nila magv-vary kung same person ba sila or not */
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             String query = "SELECT COUNT(*) FROM login.registration WHERE firstname = ? AND middlename = ? AND lastname = ? AND birthday = ?";
             PreparedStatement pS = connection.prepareStatement(query);
