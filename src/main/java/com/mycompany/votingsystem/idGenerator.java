@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 public class idGenerator{
     private String schema,table;
-    private final String PASSWORD = "andre619";
+    private final String PASSWORD = "aiellogabriel11924lastrella";
         
     int idGenerator(String schema, String table, String IDType) {
         this.schema = schema;
