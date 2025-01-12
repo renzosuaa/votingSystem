@@ -1,10 +1,8 @@
-CREATE DATABASE  IF NOT EXISTS `dbvotingsystem` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `dbvotingsystem`;
--- MySQL dump 10.13  Distrib 8.0.40, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.38, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: dbvotingsystem
+-- Host: localhost    Database: dbvotingsystem
 -- ------------------------------------------------------
--- Server version	8.0.40
+-- Server version	8.0.39
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -45,6 +43,29 @@ LOCK TABLES `candidates` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `electiondate`
+--
+
+DROP TABLE IF EXISTS `electiondate`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `electiondate` (
+  `+` int DEFAULT NULL,
+  `startDateTime` varchar(45) NOT NULL,
+  `endDateTime` varchar(45) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `electiondate`
+--
+
+LOCK TABLES `electiondate` WRITE;
+/*!40000 ALTER TABLE `electiondate` DISABLE KEYS */;
+/*!40000 ALTER TABLE `electiondate` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `vote`
 --
 
@@ -55,12 +76,8 @@ CREATE TABLE `vote` (
   `voteID` int NOT NULL,
   `voterID` int NOT NULL,
   `candidateID` int NOT NULL,
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`voterID`),
-  UNIQUE KEY `voteID_UNIQUE` (`voteID`),
-  KEY `candidateID` (`candidateID`),
-  CONSTRAINT `candidateID` FOREIGN KEY (`candidateID`) REFERENCES `candidates` (`candidateID`),
-  CONSTRAINT `voterID` FOREIGN KEY (`voterID`) REFERENCES `voters` (`voterID`)
+  `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`voteID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -86,7 +103,7 @@ CREATE TABLE `voters` (
   `firstName` varchar(45) NOT NULL,
   `middleName` varchar(45) DEFAULT NULL,
   `lastName` varchar(45) NOT NULL,
-  `birthday` date NOT NULL,
+  `birthday` varchar(45) NOT NULL,
   `gender` varchar(45) NOT NULL,
   `password` varchar(45) NOT NULL,
   `isVoted` tinyint NOT NULL DEFAULT '0',
@@ -101,6 +118,7 @@ CREATE TABLE `voters` (
 
 LOCK TABLES `voters` WRITE;
 /*!40000 ALTER TABLE `voters` DISABLE KEYS */;
+INSERT INTO `voters` VALUES (1000,'admin1','admin','admin','admin','111-11-11-1','-','admin123',0);
 /*!40000 ALTER TABLE `voters` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -113,4 +131,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-20 10:54:07
+-- Dump completed on 2025-01-07 21:19:01

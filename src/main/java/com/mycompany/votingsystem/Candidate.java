@@ -1,6 +1,6 @@
-
 package com.mycompany.votingsystem;
 
+import com.mycompany.votingsystem.idGenerator;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,104 +12,61 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-
 public class Candidate {
-    private String name,candidateID,partylist,position;
-    private LinkedList listCandidateNames;
+    String name,partylist,position;
+    int candidateID;
+     
     
+   // for Database
+    static final String URL = "jdbc:mysql://localhost:3306/dbvotingsystem";
+    static final String USER = "root"; 
+    static final String PASSWORD = "andre619";  
     
-    public String getCandidateName(int candidateID){
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","renzo072");
-            PreparedStatement ps = con.prepareStatement("Select candidateName from dbvotingsystem.candidates where candidateID=" + "\""+ candidateID + "\"");
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()){
-                name = rs.getString(1);
-            }   
-            return name; 
-            
-            } catch (ClassNotFoundException | SQLException ex) {    
-                Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
-            }
-    return null;
-    }
-    
-    public String getCandidateParty(int candidateID){
-        try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","renzo072");
-            PreparedStatement ps = con.prepareStatement("Select candidateParty from dbvotingsystem.candidates where candidateID=" + "\""+ candidateID + "\"");
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()){
-                partylist = rs.getString(1);
-            }   
-            return partylist;  
-            
-        } catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);   
-        }
+    Candidate(){
         
-    return null;
+    } 
+        // use to access candidate's info using their ID
+    Candidate(int ID){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
+            PreparedStatement ps = con.prepareStatement("Select candidateName,candidateParty, candidatePosition from dbvotingsystem.candidates where candidateID=" + "\""+ ID + "\"");
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()){
+                this.name = rs.getString(1);
+                this.partylist = rs.getString(2);
+                this.position = rs.getString(3);
+                this.candidateID = ID;
+            }    
+        } catch (ClassNotFoundException | SQLException ex) {    
+                Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
-    public String getCandidatePosition(int candidateID){
+            // use to access candidate's info using their Name
+        Candidate(String candidateName){
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","renzo072");
-            PreparedStatement ps = con.prepareStatement("Select candidatePosition from dbvotingsystem.candidates where candidateID=" + "\""+ candidateID + "\"");               
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
+            PreparedStatement ps = con.prepareStatement("Select candidateID,candidateParty,candidatePosition from dbVotingSystem.candidates where candidateName=" + "\"" + candidateName + "\"");
             ResultSet rs = ps.executeQuery();
+            
             if (rs.next()){
-                name = rs.getString(1);
-            }   
-            return position;  
-            } catch (ClassNotFoundException | SQLException ex) { 
-                Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
+                this.candidateID = rs.getInt(1);
+                this.partylist = rs.getString(2);
+                this.position = rs.getString(3);
             }
-    return null;
+        }catch(ClassNotFoundException | SQLException ex){
+            Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
     
-    public LinkedList <String> positionParticipantsIDLinkedList(String position){
-        try {      
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            LinkedList listNames = new LinkedList();
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","renzo072");
-            PreparedStatement ps = con.prepareStatement("Select candidateID from dbvotingsystem.candidates where candidatePosition= " + "\"" +position + "\"");
-            ResultSet rs = ps.executeQuery();                    
-            while (rs.next()){
-                listNames.addFirst(rs.getString(1));
-            }  
-                return listNames;
-            } catch (ClassNotFoundException | SQLException ex) {
-                Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
-            }
-    return null;    
-    }
-    
-    public String positionParticipantsString(String position){
-        try {
-            String names = "";
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","renzo072");
-            PreparedStatement ps = con.prepareStatement("Select candidateID from dbvotingsystem.candidates where candidatePosition=" + "\"" +position + "\"");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()){
-                int ID = rs.getInt(1);
-                names += ID +" - " +getCandidateName(ID)+"\t \t" +getCandidateParty(ID) + "\n";
-            }   
-            return names;  
-        } catch (ClassNotFoundException | SQLException ex) {
-        Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    return null;    
-    }
-    
-    public void addCandidate(String name, String party, String position) {
+         //add candidate to the database
+    void addCandidate(String name, String party, String position) {
         try {
             String query = "insert into dbvotingsystem.candidates(candidateID,candidateName,candidateParty,candidatePosition) VALUES (?,?,?,?)";
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","renzo072");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
             idGenerator id= new idGenerator();
                     PreparedStatement ps = con.prepareStatement(query);
                         ps.setInt(1,id.idGenerator("dbvotingsystem", "candidates","candidateID"));
@@ -124,10 +81,49 @@ public class Candidate {
         } 
     }
     
+    //returns the ID of all the Candidates in a ceratin position -- in linkedlist
+    public LinkedList <Integer> listOfAllCandidates(String position){
+        try {      
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            LinkedList listNames = new LinkedList();
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
+            PreparedStatement ps = con.prepareStatement("Select candidateID from dbvotingsystem.candidates where candidatePosition= " + "\"" +position + "\"");
+            ResultSet rs = ps.executeQuery();                    
+            while (rs.next()){
+                listNames.addFirst(rs.getInt(1));
+            }  
+                return listNames;
+            } catch (ClassNotFoundException | SQLException ex) {
+                Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    return null;    
+    }
+    
+    //returns the Name, Party, and ID of all Candidates on a certain position -- in String
+    public String listOfAllCandidatesInString(String position){
+        try {
+            String names = "";
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
+            PreparedStatement ps = con.prepareStatement("Select candidateID from dbvotingsystem.candidates where candidatePosition=" + "\"" +position + "\"");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                int ID = rs.getInt(1);
+                Candidate candidate = new Candidate(ID);
+                names += ID +" - " +candidate.name+"\t \t" +candidate.partylist + "\n";
+            }   
+            return names;  
+        } catch (ClassNotFoundException | SQLException ex) {
+        Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    return null;    
+    }
+    
+    //delete a candidate to the database
     public void deleteCandidate(int ID){
         try {           
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem","root","renzo072");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
             PreparedStatement ps = con.prepareStatement("Select candidateName from dbvotingsystem.candidates where candidateID=" + ID);
             ResultSet rs = ps.executeQuery();
             
@@ -144,5 +140,5 @@ public class Candidate {
         } catch (ClassNotFoundException | SQLException ex) {
             Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
         } 
-    }
+    }  
 }

@@ -13,6 +13,6 @@ package com.mycompany.votingsystem;
 public class VotingSystemMain {
 
     public static void main(String[] args) {
-new frameLogin().setVisible(true);
+    new frameLogin().setVisible(true);
         }
 }
