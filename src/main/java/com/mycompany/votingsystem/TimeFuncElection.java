@@ -11,14 +11,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-public class TimeFuncElection {
+public class TimeFuncElection implements sqlInfo{
 
    private LocalDateTime ldtStartDateTime,ldtEndDateTime,ldtCurrentDateTime;
     private DateTimeFormatter format = DateTimeFormatter.ofPattern(("MM/DD/yyyy/HH:mm")) ;
-   // for Database
-    static final String URL = "jdbc:mysql://localhost:3306/dbvotingsystem";
-    static final String USER = "root"; 
-    static final String PASSWORD = "andre619";  
     
         //Returns a boolean value if the current time is within the inputted start time and end time
     public boolean isWithinTime() {
@@ -35,6 +31,24 @@ public class TimeFuncElection {
                 con.close();
                 ldtCurrentDateTime = LocalDateTime.now();
                 return (ldtCurrentDateTime.isAfter(ldtStartDateTime) || ldtCurrentDateTime.isEqual(ldtStartDateTime)) && ldtCurrentDateTime.isBefore(ldtEndDateTime);
+            }   
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);   
+        } 
+    return false;
+    }
+    public boolean isAfterTime() {
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
+            PreparedStatement ps = con.prepareStatement("Select endDateTime from dbvotingsystem.electiondate");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()){
+                String strEndDateTime = rs.getString(1);
+                ldtEndDateTime = LocalDateTime.parse(strEndDateTime,DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm"));
+                con.close();
+                ldtCurrentDateTime = LocalDateTime.now();
+                return (ldtCurrentDateTime.isAfter(ldtEndDateTime));
             }   
         } catch (ClassNotFoundException | SQLException ex) {
             Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);   

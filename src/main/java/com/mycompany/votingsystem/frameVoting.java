@@ -25,7 +25,7 @@ public class frameVoting extends JFrame implements ActionListener {
     public frameVoting() {
         setSize(800, 600);
         setLayout(null);
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // Prevent closing unless explicitly done
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Prevent closing unless explicitly done
         setLocationRelativeTo(null);
         setResizable(false);
         setTitle("Voting Selection");
@@ -151,7 +151,7 @@ public class frameVoting extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "You can only select up to 6 Senators.", "Voting Limit Exceeded", JOptionPane.WARNING_MESSAGE);
         }
     }
-//Regala
+//Regala and Luna
     @Override
     public void actionPerformed(ActionEvent e) {
     if (e.getSource() == btnSubmit) {
@@ -203,13 +203,9 @@ public class frameVoting extends JFrame implements ActionListener {
         // Close the voting platform after submission
         dispose();
     } else if (e.getSource() == btnSignOut) {
-        JOptionPane.showMessageDialog(
-            this, 
-            "Thank You for Voting Wisely!", 
-            "Voting Guide", 
-            JOptionPane.INFORMATION_MESSAGE
-        );
-        dispose();
+        JOptionPane.showMessageDialog(this, "Thank You for Voting Wisely!",  "Voting Guide", JOptionPane.INFORMATION_MESSAGE);
+        dispose();  
+        new frameLogin().setVisible(true);
     }
 }
 

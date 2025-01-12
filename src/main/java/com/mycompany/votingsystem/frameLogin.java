@@ -16,12 +16,8 @@ public class frameLogin extends JFrame implements ActionListener {
     private JPasswordField txtPassword;
     private JButton btnLogin, btnRegister;
 
-    // for Database
-    static final String URL = "jdbc:mysql://localhost:3306/login";
-    static final String USER = "root"; 
-    static final String PASSWORD = "aiellogabriel11924lastrella"; 
-
-    TimeFuncElection time = new TimeFuncElection();
+    private TimeFuncElection time = new TimeFuncElection();
+    private Voter voter = new Voter();
 
     frameLogin() {
         
@@ -99,8 +95,8 @@ public class frameLogin extends JFrame implements ActionListener {
             String password = new String(txtPassword.getPassword());
 
             // FOR ADMINS: retrieve data sa adminAccounts then will be redirected to frameAdminAccess (if details are correct)
-            if (adminAccounts(email, password)) {
-                JOptionPane.showMessageDialog(btnLogin, "Login successful!", " ", JOptionPane.INFORMATION_MESSAGE);
+            if (voter.isAdmin(email, password)) {
+                JOptionPane.showMessageDialog(btnLogin, "Admin Login successful!", "Admin", JOptionPane.INFORMATION_MESSAGE);
                 new frameAdminAccess().setVisible(true); 
                 dispose();
              
@@ -113,6 +109,11 @@ public class frameLogin extends JFrame implements ActionListener {
                         if(time.isWithinTime()){
                             dispose();
                             new frameVoting().setVisible(true);
+                        }
+                        else if(time.isAfterTime()){
+                            dispose();
+                            JOptionPane.showMessageDialog(null, "Insert Analytics here", "womp womp",JOptionPane.ERROR_MESSAGE);
+                            new frameLogin().setVisible(true);
                         }
                         else{
                             dispose();
@@ -129,22 +130,4 @@ public class frameLogin extends JFrame implements ActionListener {
             new frameRegistration().setVisible(true);
         }
     }
-    
-    // to check if the email and password used in loggin in ay same sa mga naka set na admin accs
-    private boolean adminAccounts(String email, String password) {
-        
-        // List of admin emails & passwords (pwede pa mag-dagdag)
-        String[][] adminAccs = {
-            {"adminTry01@gmail.com", "adminTry01"},
-            {"adminTry02@gmail.com", "adminTry02"},
-            {"adminTry03@gmail.com", "adminTry03"}
-        };
-
-        for (String[] accounts : adminAccs) {
-            if (accounts[0].equals(email) && accounts[1].equals(password)) {
-                return true;
-            }
-        }
-        return false;
-    }  
 }
