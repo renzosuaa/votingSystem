@@ -11,10 +11,10 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 
-public class Vote {
+public class Vote implements sqlInfo {
     int voterID, candidateID, voteID;
     
-    private String username = "root", password = "renzo072";
+
     
     Vote(){};
     
@@ -22,7 +22,7 @@ public class Vote {
     Vote(int voteID){
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem",username,password);
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
             PreparedStatement ps = con.prepareStatement("Select voterID,candidateID from dbVotingSystem.vote where candidateName=" + "\"" + voteID + "\"");
             ResultSet rs = ps.executeQuery();
             
@@ -42,7 +42,7 @@ public class Vote {
         try {
             String query = "insert into dbvotingsystem.vote(voteID,voterID,candidateID) VALUES (?,?,?)";
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem",username,password);
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
                     PreparedStatement ps = con.prepareStatement(query);
                         ps.setInt(1,voteID);
                         ps.setInt(2,voterID);
