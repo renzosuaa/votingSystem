@@ -151,43 +151,68 @@ public class frameVoting extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "You can only select up to 6 Senators.", "Voting Limit Exceeded", JOptionPane.WARNING_MESSAGE);
         }
     }
-
+//Regala
     @Override
-public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
     if (e.getSource() == btnSubmit) {
-        // Collect the selected President
+        
         String selectedPresident = getSelectedCandidate(presidentGroup);
-        // Collect the selected Vice President
+        
         String selectedVicePresident = getSelectedCandidate(vicePresidentGroup);
-        // Collect the selected Senators
+        
         ArrayList<String> selectedSenators = getSelectedSenators();
+        
 
-        // Display the vote summary in a preview dialog
-        StringBuilder voteSummary = new StringBuilder();
-        voteSummary.append("Your Selected Votes:\n\n");
-
-        // Display President and Vice President
-        voteSummary.append("President: ").append(selectedPresident).append("\n");
-        voteSummary.append("Vice President: ").append(selectedVicePresident).append("\n");
-
-        // Display Senators
-        voteSummary.append("Senators: ");
-        if (selectedSenators.isEmpty()) {
-            voteSummary.append("None selected\n");
-        } else {
-            voteSummary.append(String.join(", ", selectedSenators)).append("\n");
+        StringBuilder errorMessage = new StringBuilder();
+        if ("None selected".equals(selectedPresident)) {
+            errorMessage.append("No President selected. Please vote for a President.\n");
+        }
+        if ("None selected".equals(selectedVicePresident)) {
+            errorMessage.append("No Vice President selected. Please vote for a Vice President.\n");
         }
 
-        // Show the summary
-        JOptionPane.showMessageDialog(this, voteSummary.toString(), "Your Voting Summary", JOptionPane.INFORMATION_MESSAGE);
+        if (errorMessage.length() > 0) {
+            JOptionPane.showMessageDialog(
+                this, 
+                errorMessage.toString(), 
+                "Incomplete Votes", 
+                JOptionPane.ERROR_MESSAGE
+            );
+            return; 
+        }
+
+        // Add "Abstain" entries if fewer than 6 senators are selected
+        while (selectedSenators.size() < 6) {
+            selectedSenators.add("Abstain");
+        }
+
+        // Build and display the vote summary
+        StringBuilder voteSummary = new StringBuilder();
+        voteSummary.append("Your Selected Votes:\n\n");
+        voteSummary.append("President: ").append(selectedPresident).append("\n");
+        voteSummary.append("Vice President: ").append(selectedVicePresident).append("\n");
+        voteSummary.append("Senators: ").append(String.join(", ", selectedSenators)).append("\n");
+
+        JOptionPane.showMessageDialog(
+            this, 
+            voteSummary.toString(), 
+            "Your Voting Summary", 
+            JOptionPane.INFORMATION_MESSAGE
+        );
 
         // Close the voting platform after submission
         dispose();
     } else if (e.getSource() == btnSignOut) {
-        JOptionPane.showMessageDialog(this, "Thank You for Voting Wisely!", "Voting Guide", JOptionPane.INFORMATION_MESSAGE);
-        dispose();  // Close the frame when sign out is clicked
+        JOptionPane.showMessageDialog(
+            this, 
+            "Thank You for Voting Wisely!", 
+            "Voting Guide", 
+            JOptionPane.INFORMATION_MESSAGE
+        );
+        dispose();
     }
 }
+
 
 // Helper method to get the selected candidate from a ButtonGroup (President or Vice President)
 private String getSelectedCandidate(ButtonGroup group) {
