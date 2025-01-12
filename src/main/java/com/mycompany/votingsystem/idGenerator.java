@@ -9,9 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class idGenerator{
+public class idGenerator implements sqlInfo{
     private String schema,table;
-    private final String PASSWORD = "andre619";
         
     int idGenerator(String schema, String table, String IDType) {
         this.schema = schema;
@@ -20,7 +19,7 @@ public class idGenerator{
         
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/"+schema,"root",PASSWORD);
+            Connection con=DriverManager.getConnection(URL,USER,PASSWORD);
             //Make a SQL query to display the current largest ID number
             String query = "select "+ IDType+" from "+ schema +"."+table+" order by "+ IDType +" desc limit 1";
             PreparedStatement ps = con.prepareStatement(query);
@@ -29,23 +28,22 @@ public class idGenerator{
                 int id = (Integer)rs.getInt(1);
                 ps.close();
                 con.close();
-                if (IDType.equals("voteID")){
-                    return id-1;
-                }
+       
                 return id+1;
             }
-        } catch (ClassNotFoundException | SQLException e){
-            Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, e);
-        }
-        switch (IDType){
+            
+           switch (IDType){
             case "voterID": 
                 return 1000;
             case "candidateID":
                 return 1;
             case "voteID":
-                return 99999;
-
+                return 100000;
+            }   
+        } catch (ClassNotFoundException | SQLException e){
+            Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, e);
         }
+       
         return 0;
     }
 }

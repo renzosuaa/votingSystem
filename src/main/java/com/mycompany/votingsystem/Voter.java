@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.votingsystem;
 
 import java.sql.Connection;
@@ -14,15 +10,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-public class Voter {
+public class Voter implements sqlInfo{
     private String name, voterID;
-    private final String username = "root", password = "andre619";
 
-    public void addVoter(int ID, String Email, String Firstname, String Middlename, String Lastname, String Birthday, String Gender, String Password) throws SQLException {
+    public void addVoter(int ID, String Email, String Firstname, String Middlename, String Lastname, String Birthday, String Gender, String Password){
         try {
-            String query = "INSERT INTO Registration (VoterID, VoterEmail, VoterFirstname, VoterMiddlename, VoterLastname, VoterBirthday, VoterGender, VoterPassword) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO voters (VoterID, email, firstName, middleName, lastName, birthday, gender, password) VALUES (?, ?, ?, ?, ?, ?, ?,?)";
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem", username, password);
+            Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
 
             PreparedStatement ps = con.prepareStatement(query);
             ps.setInt(1, ID);
@@ -45,7 +40,7 @@ public class Voter {
     public String getGender(int voterID){
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem",username,password);
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
             PreparedStatement ps = con.prepareStatement("Select gender from dbvotingsystem.voters where voterID=" + "\""+ voterID + "\"");
             ResultSet rs = ps.executeQuery();
             
@@ -63,7 +58,7 @@ public class Voter {
     public String getBirthday(int voterID){
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbvotingsystem",username,password);
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
             PreparedStatement ps = con.prepareStatement("Select birthday from dbvotingsystem.voters where voterID=" + "\""+ voterID + "\"");
             ResultSet rs = ps.executeQuery();
             
@@ -76,5 +71,23 @@ public class Voter {
                 Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
             }
     return null;
+    }
+    public boolean isAdmin(String adminEmail, String adminPassword){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
+            PreparedStatement ps = con.prepareStatement("Select email, password from dbvotingsystem.voters where voterID=1000");
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()){
+                if(adminEmail.equals(rs.getString(1))&&adminPassword.equals(rs.getString(2))){
+                    return true;
+                }
+            }
+          
+            } catch (ClassNotFoundException | SQLException ex) {    
+                Logger.getLogger(Voter.class.getName()).log(Level.SEVERE, null, ex);
+            }
+                return false;
     }
 }

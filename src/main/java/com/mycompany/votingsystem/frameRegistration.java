@@ -12,24 +12,26 @@ import java.sql.SQLException;
 import java.time.DateTimeException;
 import javax.swing.*;
 import java.time.LocalDate;
-import java.time.Period;
+import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingConstants;
 
     
-public class frameRegistration extends JFrame {
+public class frameRegistration extends JFrame implements ActionListener, sqlInfo {
 
-    // UI components
+    // components
     private JLabel lblHeader,lblLogo, lblCOE, lblOrg, lblEmail, lblFirstName, lblMiddleName, lblLastName, lblBirthday, 
                    lblGender, lblPassword, lblConfirmPassword;
     private JTextField txtEmail, txtFirstName, txtMiddleName, txtLastName, txtBirthMonth, txtBirthDay, txtBirthYear;
     private JPasswordField txtPassword, txtConfirmPassword;
     private JRadioButton rbtnMale, rbtnFemale;
-    private JButton btnCreateAccount, btnCancel, btnBack;
-    
-    static final String URL = "jdbc:mysql://localhost:3306/login";
-    static final String USER = "root"; 
-    static final String PASSWORD = "aiellogabriel11924lastrella"; 
+    private JButton btnCreateAccount, btnBack;
 
+    private static Hashtable<String, String> users_HT = new Hashtable<>();
+    
+    private idGenerator idGen = new idGenerator();
+    private Voter voter = new Voter();
     frameRegistration() {
         
         setTitle("Registration");
@@ -39,7 +41,7 @@ public class frameRegistration extends JFrame {
         setLocationRelativeTo(null);
         
         lblHeader = new JLabel("Welcome! Please Register", SwingConstants.LEFT);
-        lblHeader.setBounds(170, 20, 300, 50);
+        lblHeader.setBounds(190, 20, 300, 50);
         lblHeader.setFont(new Font ("Arial",Font.BOLD,20));
         add(lblHeader);
         
@@ -62,7 +64,6 @@ public class frameRegistration extends JFrame {
         lblOrg.setFont(new Font ("Arial",Font.BOLD,16));
         add(lblOrg);
         
-
         // Email
         lblEmail = new JLabel("Email:");
         lblEmail.setBounds(30, 90, 150, 30);
@@ -124,11 +125,12 @@ public class frameRegistration extends JFrame {
         rbtnFemale = new JRadioButton("Female");
         rbtnFemale.setBounds(280, 290, 100, 30);
         add(rbtnFemale);
+        
+        ButtonGroup gGroup = new ButtonGroup();
+        gGroup.add(rbtnMale);
+        gGroup.add(rbtnFemale);
 
-        /*ButtonGroup genderGroup = new ButtonGroup();
-        genderGroup.add(rbtnMale);
-        genderGroup.add(rbtnFemale);*/
-
+      
         // Password
         lblPassword = new JLabel("Password:");
         lblPassword.setBounds(30, 330, 150, 30);
@@ -147,177 +149,122 @@ public class frameRegistration extends JFrame {
 
         // Create Account Button
         btnCreateAccount = new JButton("Create Account");
-        btnCreateAccount.setBounds(180, 420, 130, 30);
+        btnCreateAccount.setBounds(250, 420, 130, 30);
         add(btnCreateAccount);
-        
-        btnCancel = new JButton("Cancel");
-        btnCancel.setBounds(320, 420, 130, 30);
-        add(btnCancel);
         
         btnBack = new JButton("Back");
         btnBack.setBounds(670, 515, 95, 30);
         add(btnBack);
-
-        btnCreateAccount.addActionListener(this::createAccount);
-        
-        btnCancel.addActionListener(e -> {
-            dispose(); // Close the registration frame
-            JOptionPane.showMessageDialog(this, "Cancel creating an account?", "Info", JOptionPane.INFORMATION_MESSAGE);
-            new frameLogin().setVisible(true);
- 
-        });
-        
-        btnBack.addActionListener(e -> {
-            dispose(); // Close the registration frame
-            //JOptionPane.showMessageDialog(this, "Cancel creating an account?", "Info", JOptionPane.INFORMATION_MESSAGE);
-            new frameLogin().setVisible(true);
- 
-        });
+       
+        btnCreateAccount.addActionListener(this);
+        btnBack.addActionListener(this);
     }
     
-    // function
-    private void createAccount(ActionEvent e) {
-        String email = txtEmail.getText();
-        String firstName = txtFirstName.getText();
-        String middleName = txtMiddleName.getText();
-        String lastName = txtLastName.getText();                        
-                    
-        String mm = txtBirthMonth.getText();
-        String dd = txtBirthDay.getText();
-        String yyyy = txtBirthYear.getText();
-        String birthdayFormat = String.format("%s-%s-%s", mm, dd, yyyy);
-                    
-        String gender = null;
-            if (rbtnMale.isSelected()) {
-                gender = "Male";
-            } else if (rbtnFemale.isSelected()) {
-                gender = "Female";
-            }
-                    
-        String password = new String(txtPassword.getPassword());
-        String conPassword = new String(txtConfirmPassword.getPassword());                 
-                    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource()==btnCreateAccount){
+            String email = txtEmail.getText();
+            String firstName = txtFirstName.getText();
+            String middleName = txtMiddleName.getText();
+            String lastName = txtLastName.getText();                        
 
-        // Para sure kung may laman yung parts ng form
-            if (email.isEmpty() || firstName.isEmpty() || middleName.isEmpty() || lastName.isEmpty() || mm.isEmpty() ||
-                dd.isEmpty() || yyyy.isEmpty() || password.isEmpty() || conPassword.isEmpty()) {
-                JOptionPane.showMessageDialog(btnCreateAccount, "Text fields cannot be empty.");
+            String mm = txtBirthMonth.getText();
+            String dd = txtBirthDay.getText();
+            String yyyy = txtBirthYear.getText();
+            String birthdayFormat = String.format(mm + "/" + dd + "/" + yyyy);
+
+            String gender = null;
+                if (rbtnMale.isSelected()) {
+                    gender = "Male";
+                } else if (rbtnFemale.isSelected()) {
+                    gender = "Female";
+                }
+                ButtonGroup gGroup = new ButtonGroup();
+                gGroup.add(rbtnMale);
+                gGroup.add(rbtnFemale);
+
+            String password = new String(txtPassword.getPassword());
+            String conPassword = new String(txtConfirmPassword.getPassword());                 
+
+
+                // Para sure kung may laman yung parts ng form
+                if (email.isEmpty() || firstName.isEmpty() || middleName.isEmpty() || lastName.isEmpty() || mm.isEmpty() ||
+                    dd.isEmpty() || yyyy.isEmpty() || password.isEmpty() || conPassword.isEmpty()) {
+                    JOptionPane.showMessageDialog(btnCreateAccount, "Text fields cannot be empty.");
+                    return;
+                }
+
+                // para sure yung email
+                if (!email.endsWith("@gmail.com") && !email.endsWith("@yahoo.com")) {
+                    JOptionPane.showMessageDialog(btnCreateAccount, "Email must be correct.");
+                    return;
+                }
+
+                // Para sure kung hindi sobra or kulang yung numbers sa birthday
+                if (!birthdayFormat.matches("^\\d{2}/\\d{2}/\\d{4}$")) {
+                    JOptionPane.showMessageDialog(btnCreateAccount, "Birthday must be in MM/DD/YYYY format.");
+                    return;
+                }
+
+
+            // Para sure kung numeric format yung nilagay sa birthday
+            LocalDate birthday;
+            try {
+                birthday = LocalDate.of(Integer.parseInt(yyyy), Integer.parseInt(mm), Integer.parseInt(dd));
+            } catch (DateTimeException ex) {
+                JOptionPane.showMessageDialog(btnCreateAccount, "Birthday must be correct.");
                 return;
             }
-                    
-                    
-        // Para sure kung hindi sobra or kulang yung numbers sa birthday
-            if (!mm.matches("\\d{1,2}") || !dd.matches("\\d{1,2}") || !yyyy.matches("\\d{4}")) {
-                JOptionPane.showMessageDialog(btnCreateAccount, "Birthday must be in correct format.");
-                return;
-            }
-                    
-                    
-        // Para sure kung numeric format yung nilagay sa birthday (based on Luna's work)
-        LocalDate birthday;
-        try {
-            birthday = LocalDate.of(Integer.parseInt(yyyy), Integer.parseInt(mm), Integer.parseInt(dd));
-        } catch (DateTimeException ex) {
-            JOptionPane.showMessageDialog(btnCreateAccount, "Birthday must be in numeric form..");
-            return;
+
+
+                // Para sure kung legal age na
+                LocalDate present = LocalDate.now();
+                int age = present.getYear() - birthday.getYear();
+
+                if (age < 18) {
+                    JOptionPane.showMessageDialog(btnCreateAccount, "You are not yet in legal age to register.");
+                    return;
+                }
+
+                // Confirm Password
+                if (!password.equals(conPassword)) {
+                    JOptionPane.showMessageDialog(btnCreateAccount, "Passwords do not match.");
+                    return;
+                }
+                
+
+                
+                voter.addVoter(idGen.idGenerator("dbvotingsystem", "voters", "voterID"), email, firstName, middleName, lastName, birthdayFormat, gender, password);
+                JOptionPane.showMessageDialog(null, "Account Successfully Created.", "Account Creation",JOptionPane.INFORMATION_MESSAGE);
+                new frameLogin().setVisible(true);
+                dispose();
         }
-
-                    
-        // Para sure kung legal age na (based on Luna's work)
-            LocalDate present = LocalDate.now();
-            int age = present.getYear() - birthday.getYear();
-                    
-            if (age < 18) {
-                JOptionPane.showMessageDialog(btnCreateAccount, "You are not yet legal toregister.");
-                return;
-            }
-                 
-                   
-        // Confirm Password (based 'to sa gawa nila Luna)
-            if (!password.equals(conPassword)) {
-                JOptionPane.showMessageDialog(btnCreateAccount, "Passwords do not match.");
-                return;
-            }
-
-                   
-        // Para sure kung wala pang katulad yung email ssa Database
-        try (Connection connection = DriverManager.getConnection(frameRegistration.URL, frameRegistration.USER, 
-                                                                 frameRegistration.PASSWORD)) {
-            String query = "SELECT COUNT(*) FROM login.registration WHERE email = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, email);
-            ResultSet rS = preparedStatement.executeQuery();
-
-            if (rS.next() && rS.getInt(1) > 0) {
-                JOptionPane.showMessageDialog(btnCreateAccount, "Email already exists in the database. Please choose another.");
-                return;
-            }
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            JOptionPane.showMessageDialog(btnCreateAccount, "Database error: " + exception.getMessage());
-            return;
-        }
-                    
-                    
-        // Para ma-insert yung data sa Database
-        try {
-            int id = createID();
-            Connection connection = DriverManager.getConnection(frameRegistration.URL, frameRegistration.USER, 
-                                                                frameRegistration.PASSWORD);
-                        
-            String query = "INSERT INTO login.registration (id, email, firstname, middlename, lastname,"
-                    + "birthday, gender, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-
-            preparedStatement.setInt(1, id);
-            preparedStatement.setString(2, email);
-            preparedStatement.setString(3, firstName);
-            preparedStatement.setString(4, middleName);
-            preparedStatement.setString(5, lastName);
-            preparedStatement.setString(6, birthdayFormat);
-            preparedStatement.setString(7, gender);
-            preparedStatement.setString(8, password); 
-
-            int result = preparedStatement.executeUpdate();
-            txtEmail.setText("");
-            txtFirstName.setText("");
-            txtMiddleName.setText("");
-            txtLastName.setText("");
-            txtBirthMonth.setText("");
-            txtBirthDay.setText("");
-            txtBirthYear.setText("");
-            rbtnMale.setText("");
-            rbtnFemale.setText("");
-            txtPassword.setText("");
-            txtConfirmPassword.setText("");
-            if (result > 0) {
-                JOptionPane.showMessageDialog(btnCreateAccount, "Account created successfully!");
-
-            } else {
-                JOptionPane.showMessageDialog(btnCreateAccount, "Error creating account.");
-            }
-            connection.close();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            JOptionPane.showMessageDialog(btnCreateAccount, "Database error: " + exception.getMessage());
-        }
-        //dispose();
-
+        else if(e.getSource()==btnBack){
+            new frameLogin().setVisible(true);
+            dispose();
+        } 
     }
     
-    private int createID() {
-        String query = "SELECT COALESCE(MAX(id), 0) + 1 FROM login.registration";
-        try (Connection connection = DriverManager.getConnection(frameRegistration.URL, frameRegistration.USER, frameRegistration.PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(query);
-             ResultSet info = preparedStatement.executeQuery()) {
+    
+    // retrieving data from hash table
+    public static Hashtable<String, String> retrieve_HT() {
+        return users_HT;
+    }
+    
+    // data sa database will be reloaded in hash table tuwing bubuksan ang app
+    public static void data_HT() {
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            String query = "SELECT email, password FROM dbvotingsystem.voters";
+            PreparedStatement pS = connection.prepareStatement(query);
 
-            if (info.next()) {
-                return info.getInt(1);
+            ResultSet rS = pS.executeQuery();
+            while (rS.next()) {
+                String email = rS.getString("email");
+                String password = rS.getString("password");
+                users_HT.put(email, password);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 1;
     }
-           
 }

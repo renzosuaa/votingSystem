@@ -12,15 +12,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-public class Candidate {
+public class Candidate  implements sqlInfo{
     String name,partylist,position;
     int candidateID;
-     
-    
-   // for Database
-    static final String URL = "jdbc:mysql://localhost:3306/dbvotingsystem";
-    static final String USER = "root"; 
-    static final String PASSWORD = "andre619";  
     
     Candidate(){
         

@@ -5,24 +5,14 @@ package com.mycompany.votingsystem;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.text.ParseException;
 import java.time.*;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class frameAdminAccess extends JFrame implements ActionListener {
-    
+            
         private JTextArea txtaSummary;
         private JLabel hdrAdmin,hdrAdd,hdrRemove,lblAddName,lblAddParty,lblAddPosition,
                 lblRemoveID,hdrElectionDate,lblStartElection,lblEndElection,lblTimeForm,lblDateForm;
@@ -263,7 +253,6 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                 if (!txtfRemoveID.getText().equals("")){  
                     try{
                         int ID = Integer.parseInt(txtfRemoveID.getText());
-                // ** will later solve how to implement an error message if the ID does not exist in the data base **          
                         txtfRemoveName.setText("");
                         txtfRemoveParty.setText("");
                         txtfRemovePosition.setText("");
@@ -299,6 +288,7 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                 } 
         }
         
+        //sets the election date into the database
         else if(e.getSource()==btnSetElection){
             if(!txtfDateEndElection.getText().isBlank() && !txtfTimeEndElection.getText().isBlank() && !txtfDateStartElection.getText().isBlank() && !txtfDateStartElection.getText().isBlank()){
                 String StartDateTime = txtfDateStartElection.getText().trim()+" "+txtfTimeStartElection.getText().trim();   
@@ -313,8 +303,7 @@ public class frameAdminAccess extends JFrame implements ActionListener {
         else if(e.getSource()==btnForceEndElection){
                 int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to end the Elections?", "End Election?", JOptionPane.YES_NO_OPTION);
                 if(confirm == JOptionPane.YES_OPTION){
-                        JOptionPane.showMessageDialog(this, "The election has been forcefully halted.","End Election",JOptionPane.INFORMATION_MESSAGE);
-                        ElectionOn = false;
+                        timec.forceStop();
                 }   
         }
     }   
