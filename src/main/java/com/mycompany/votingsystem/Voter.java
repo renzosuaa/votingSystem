@@ -11,7 +11,30 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 public class Voter implements sqlInfo{
-    private String name, voterID;
+    String name;
+    int voterID;
+    boolean isVoted;
+    
+    
+    Voter (){};
+    Voter(String email){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
+            PreparedStatement ps = con.prepareStatement("Select firstName,middleName,lastName,voterID,isVoted from dbvotingsystem.voters where email=" + "\""+ email + "\"");
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()){
+                name = rs.getString(3) + ", " + rs.getString(1) + " "+rs.getString(2);
+                voterID = rs.getInt(4);
+                isVoted = rs.getInt(5) != 0;  
+            }   
+            
+        } catch (ClassNotFoundException | SQLException ex) {    
+            Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
 
     public void addVoter(int ID, String Email, String Firstname, String Middlename, String Lastname, String Birthday, String Gender, String Password){
         try {
@@ -53,6 +76,19 @@ public class Voter implements sqlInfo{
                 Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
             }
     return null;
+    }
+    
+    public void setVoterToVoted(){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
+            PreparedStatement ps = con.prepareStatement("Update dbvotingsystem.voters set isVoted = '1' where voterID=" +  voterID );
+            ps.executeUpdate();
+   
+        } catch (ClassNotFoundException | SQLException ex) {    
+            Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);
+        }
+  
     }
     
     public String getBirthday(int voterID){

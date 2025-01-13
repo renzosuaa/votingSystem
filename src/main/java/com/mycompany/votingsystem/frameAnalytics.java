@@ -1,18 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.votingsystem;
-
-/**
- *
- * @author ACER
- */
 
 import java.awt.Color;
 import java.awt.Font;
-import java.text.DecimalFormat;
-import java.util.Arrays;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -22,16 +13,16 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-public class frameAnalytics extends JFrame {
+public class frameAnalytics extends JFrame implements ActionListener {
 
     JTabbedPane tab;
     JLabel lblTotalCasted,lblTotalVotes,lblAnalyticsCandidate,lblAnalyticsVotes,
             lblFemaleVotes,lblFemaleVotesPerc,lblMaleVotes,lblMaleVotesPerc,
             lblAgeGroup,lblGeneration1,lblGeneration2,lblGeneration3,lblGeneration4,
             lblGeneration1Perc,lblGeneration2Perc,lblGeneration3Perc,lblGeneration4Perc;
-    percentage perCon = new percentage();         
+    percentage perCon = new percentage();      
+    JButton btnSignOut;
     votingAnalytics analytics = new votingAnalytics();
-    //int intTotalCandidateVotes, intTotalVotes = analytics.totalPresidentVotes;
     int intTotalCandidateVotes, intTotalVotes = analytics.totalPresidentVotes;
 
     public frameAnalytics(){
@@ -43,14 +34,6 @@ public class frameAnalytics extends JFrame {
         tab.setSize(500, 500);
         add(tab);
 
-
-        JPanel page2 = new JPanel();
-        page2.add(new JLabel("VIce Presidents"));
-
-
-        JPanel page3 = new JPanel();
-        page2.add(new JLabel("VIce Presidents"));
-
         tab.addTab("Presidents", addPage("President", analytics.sortedCandidatesByVote("President")));
         tab.addTab("Vice Presidents", addPage("Vice President", analytics.sortedCandidatesByVote("Vice President")));
         tab.addTab("Senators", addPage("Senator",analytics.sortedCandidatesByVote("Senator")));
@@ -60,7 +43,7 @@ public class frameAnalytics extends JFrame {
         lblTotalCasted.setFont(new Font("Verdana",Font.BOLD, 18));
         add(lblTotalCasted);
 
-        lblTotalVotes = new JLabel(String.valueOf(analytics.totalCastedVotes),SwingConstants.CENTER);
+        lblTotalVotes = new JLabel(String.valueOf(analytics.totalPresidentVotes),SwingConstants.CENTER);
         lblTotalVotes.setBounds(550,45,200,30);
         lblTotalVotes.setFont(new Font("Verdana",Font.BOLD, 16));
         add(lblTotalVotes);
@@ -72,7 +55,7 @@ public class frameAnalytics extends JFrame {
         paneAnalytics.setLayout(null);
         add(paneAnalytics);
     
-        lblAnalyticsCandidate = new JLabel("Jose Ryle Andre Guico Almazora",SwingConstants.CENTER);
+        lblAnalyticsCandidate = new JLabel("Candidate Name",SwingConstants.CENTER);
         lblAnalyticsCandidate.setBounds(0, 0, 250, 50);
         lblAnalyticsCandidate.setFont(new Font("Arial",Font.PLAIN,16));
         paneAnalytics.add(lblAnalyticsCandidate);
@@ -136,8 +119,13 @@ public class frameAnalytics extends JFrame {
         lblGeneration4Perc.setBounds(115, 350, 275, 50);
         paneAnalytics.add(lblGeneration4Perc);
         
+        btnSignOut = new JButton("Sign-Out");
+        btnSignOut.setBounds(675,515,100,30);
+        btnSignOut.addActionListener(this);
+        add(btnSignOut);
+        
 }
-    
+    //function that creates panel per position
     public JPanel addPage(String Position, HashMap<Integer,Integer> hm){
         
         JPanel page = new JPanel();
@@ -154,9 +142,13 @@ public class frameAnalytics extends JFrame {
         
         for (int ID : hm.keySet()){
             Candidate candidate = new Candidate(ID);
-            
+            if(Position.equals("Senator")){
+                String[] arrCandidateRow = {candidate.name,candidate.partylist,perCon.addPercent(hm.get(ID),(float)intTotalVotes*6)};
+            model.addRow(arrCandidateRow);
+            }else{
             String[] arrCandidateRow = {candidate.name,candidate.partylist,perCon.getPercentString(hm.get(ID),intTotalVotes)};
             model.addRow(arrCandidateRow);
+            }
         }
                 
         JTable jtCandidate = new JTable(model);
@@ -174,24 +166,21 @@ public class frameAnalytics extends JFrame {
             public void valueChanged(ListSelectionEvent event){
                 if(!event.getValueIsAdjusting()){
                     int selectedRow = jtCandidate.getSelectedRow();
+                                       
                     if(selectedRow != -1){
                         String candidateName = (String)jtCandidate.getValueAt(selectedRow, 0);
                         lblAnalyticsCandidate.setText(candidateName);
                         
                         int candidateID = new Candidate(candidateName).candidateID;
                         int[] candidateAnalyics = analytics.getCandidateStatistics(candidateID);
-                        
-                                intTotalCandidateVotes = hm.get(candidateID);
+                        intTotalCandidateVotes = hm.get(candidateID);
                         
                    //placeholder for votes based on sex :3
                         int voteCountMale = candidateAnalyics[0];
                         int voteCountFemale = candidateAnalyics[1];
-                        
                         lblAnalyticsVotes.setText(perCon.getPercentString(intTotalCandidateVotes, analytics.votePerPosition(Position))+ " " + "  -  " + String.valueOf(hm.get(candidateID)) + " Votes" );
                         lblFemaleVotesPerc.setText((perCon.getPercentString(voteCountFemale,intTotalCandidateVotes))+"               "+voteCountFemale);
-                        lblMaleVotesPerc.setText((perCon.getPercentString(voteCountMale, intTotalCandidateVotes))+"               "+voteCountMale);
-                   
-                        System.out.println("intTotal: " + intTotalCandidateVotes + ":" + intTotalVotes );
+                        lblMaleVotesPerc.setText((perCon.getPercentString(voteCountMale, intTotalCandidateVotes))+"               "+voteCountMale);                  
                         
                    //placeholder for votes based on age
                         int voteCountGen1 = candidateAnalyics[2];
@@ -201,16 +190,23 @@ public class frameAnalytics extends JFrame {
                         lblGeneration1Perc.setText((perCon.getPercentString(voteCountGen1,intTotalCandidateVotes))+"               "+voteCountGen1);
                         lblGeneration2Perc.setText((perCon.getPercentString(voteCountGen2, intTotalCandidateVotes))+"               "+voteCountGen2);
                         lblGeneration3Perc.setText((perCon.getPercentString(voteCountGen3,intTotalCandidateVotes))+"               "+voteCountGen3);
-                        lblGeneration4Perc.setText((perCon.getPercentString(voteCountGen4, intTotalCandidateVotes))+"               "+voteCountGen4);
-                        System.out.println(hm.keySet());
+                        lblGeneration4Perc.setText((perCon.getPercentString(voteCountGen4, intTotalCandidateVotes))+"               "+voteCountGen4);  
+                    
                         jtCandidate.clearSelection();
                     }
+                    
                 }
-                
-            }
+        }
         });
     
     return page;
     }   
-}
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == btnSignOut){
+            dispose();
+            new frameLogin().setVisible(rootPaneCheckingEnabled);
+        }
+    }
+}

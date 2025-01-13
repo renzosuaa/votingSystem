@@ -10,12 +10,8 @@ import java.util.logging.Logger;
 
 
 public class idGenerator implements sqlInfo{
-    private String schema,table;
-        
+            
     int idGenerator(String schema, String table, String IDType) {
-        this.schema = schema;
-        this.table = table;
-        
         
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -28,8 +24,9 @@ public class idGenerator implements sqlInfo{
                 int id = (Integer)rs.getInt(1);
                 ps.close();
                 con.close();
-       
-                return id+1;
+                if (id>0){
+                    return id+1;
+                }                
             }
             
            switch (IDType){

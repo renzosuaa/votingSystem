@@ -14,7 +14,6 @@ import javax.swing.JOptionPane;
 public class TimeFuncElection implements sqlInfo{
 
    private LocalDateTime ldtStartDateTime,ldtEndDateTime,ldtCurrentDateTime;
-    private DateTimeFormatter format = DateTimeFormatter.ofPattern(("MM/DD/yyyy/HH:mm")) ;
     
         //Returns a boolean value if the current time is within the inputted start time and end time
     public boolean isWithinTime() {
@@ -37,6 +36,23 @@ public class TimeFuncElection implements sqlInfo{
         } 
     return false;
     }
+        //Fetch end of the election on  the database
+    public String getElectionEndTime() {
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
+            PreparedStatement ps = con.prepareStatement("Select endDateTime from dbvotingsystem.electiondate");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()){
+                return rs.getString(1);
+            }   
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);   
+        } 
+    return null;
+    }
+    
+        //returns a boolean value if current time is after end of electinon time
     public boolean isAfterTime() {
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -56,6 +72,7 @@ public class TimeFuncElection implements sqlInfo{
     return false;
     }
     
+        //Set or Replace the start date time nad end date time on the database
     public void setTime(String StartDateTime, String EndDateTime){
         try{
             ldtStartDateTime = LocalDateTime.parse(StartDateTime,DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm"));
@@ -85,20 +102,21 @@ public class TimeFuncElection implements sqlInfo{
             JOptionPane.showMessageDialog(null, "Date entered is invalid. Please follow the correct format: \nDate: MM/dd/yyyy \nTime: HH:mm","Error",JOptionPane.ERROR_MESSAGE);
         }        
     }
+    
+        //Stop the election by clearing the startDateTime and endDateTime of the election on the database 
     public void forceStop(){
         try{
-                    Class.forName("com.mysql.cj.jdbc.Driver");
-                    Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
-                        PreparedStatement psClear = con.prepareStatement("Truncate Table dbvotingsystem.electiondate");
-                        psClear.execute();
-                        JOptionPane.showMessageDialog(null, "The Elections have benn forcefully stopped.", "Force Stop", JOptionPane.INFORMATION_MESSAGE);
-                } catch (ClassNotFoundException | SQLException ex) {
-                    Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);   
-                }
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(URL,USER,PASSWORD);
+            PreparedStatement psClear = con.prepareStatement("Truncate Table dbvotingsystem.electiondate");
+            psClear.execute();
+            JOptionPane.showMessageDialog(null, "The Elections have benn forcefully stopped.", "Force Stop", JOptionPane.INFORMATION_MESSAGE);
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(Candidate.class.getName()).log(Level.SEVERE, null, ex);   
+        }
     }
     
-    
-    //returns a bool that ensures that the start end time entered does not happen before the time start; used for ensuring that time set is feasible
+        //returns a bool that ensures that the start end time entered does not happen before the time start; used for ensuring that time set is feasible
     public boolean isStartBeforeEnd(LocalDateTime ldtSDT,LocalDateTime ldtEDT){
         this.ldtStartDateTime = ldtSDT;
         this.ldtEndDateTime = ldtEDT;
