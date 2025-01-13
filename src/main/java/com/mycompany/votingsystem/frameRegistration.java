@@ -1,37 +1,43 @@
 package com.mycompany.votingsystem;
 
 // Aiello Gabriel B. Lastrella
-
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.DateTimeException;
-import javax.swing.*;
 import java.time.LocalDate;
 import java.util.Hashtable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-
     
 public class frameRegistration extends JFrame implements ActionListener, sqlInfo {
 
     // components
-    private JLabel lblHeader,lblLogo, lblCOE, lblOrg, lblEmail, lblFirstName, lblMiddleName, lblLastName, lblBirthday, 
+    private final JLabel lblHeader,lblLogo, lblCOE, lblOrg, lblEmail, lblFirstName, lblMiddleName, lblLastName, lblBirthday, 
                    lblGender, lblPassword, lblConfirmPassword;
-    private JTextField txtEmail, txtFirstName, txtMiddleName, txtLastName, txtBirthMonth, txtBirthDay, txtBirthYear;
-    private JPasswordField txtPassword, txtConfirmPassword;
-    private JRadioButton rbtnMale, rbtnFemale;
-    private JButton btnCreateAccount, btnBack;
+    private final JTextField txtEmail, txtFirstName, txtMiddleName, txtLastName, txtBirthMonth, txtBirthDay, txtBirthYear;
+    private final JPasswordField txtPassword, txtConfirmPassword;
+    private final JRadioButton rbtnMale, rbtnFemale;
+    private final JButton btnCreateAccount, btnBack;
 
-    private static Hashtable<String, String> users_HT = new Hashtable<>();
+    private final  static Hashtable<String, String> users_HT = new Hashtable<>();
     
-    private idGenerator idGen = new idGenerator();
-    private Voter voter = new Voter();
+    private final idGenerator idGen = new idGenerator();
+    private final Voter voter = new Voter();
     frameRegistration() {
         
         setTitle("Registration");
@@ -129,7 +135,6 @@ public class frameRegistration extends JFrame implements ActionListener, sqlInfo
         ButtonGroup gGroup = new ButtonGroup();
         gGroup.add(rbtnMale);
         gGroup.add(rbtnFemale);
-
       
         // Password
         lblPassword = new JLabel("Password:");
@@ -185,27 +190,31 @@ public class frameRegistration extends JFrame implements ActionListener, sqlInfo
 
             String password = new String(txtPassword.getPassword());
             String conPassword = new String(txtConfirmPassword.getPassword());                 
+            
+            // Para sure kung may laman yung parts ng form
+            if (email.isEmpty() || firstName.isEmpty() || middleName.isEmpty() || lastName.isEmpty() || mm.isEmpty() ||
+                dd.isEmpty() || yyyy.isEmpty() || password.isEmpty() || conPassword.isEmpty()) {
+                JOptionPane.showMessageDialog(btnCreateAccount, "Text fields cannot be empty.");
+                return;
+            }
 
+            // para sure yung email
+            if (!email.endsWith("@gmail.com") && !email.endsWith("@yahoo.com")) {
+                JOptionPane.showMessageDialog(btnCreateAccount, "Email must be correct.");
+                return;
+            }
+            
+            //check if email is already been used
+            if (new Voter(email).name != null){
+                JOptionPane.showMessageDialog(btnCreateAccount, "This Email is Already Taken");
+                return;
+            }
 
-                // Para sure kung may laman yung parts ng form
-                if (email.isEmpty() || firstName.isEmpty() || middleName.isEmpty() || lastName.isEmpty() || mm.isEmpty() ||
-                    dd.isEmpty() || yyyy.isEmpty() || password.isEmpty() || conPassword.isEmpty()) {
-                    JOptionPane.showMessageDialog(btnCreateAccount, "Text fields cannot be empty.");
-                    return;
-                }
-
-                // para sure yung email
-                if (!email.endsWith("@gmail.com") && !email.endsWith("@yahoo.com")) {
-                    JOptionPane.showMessageDialog(btnCreateAccount, "Email must be correct.");
-                    return;
-                }
-
-                // Para sure kung hindi sobra or kulang yung numbers sa birthday
-                if (!birthdayFormat.matches("^\\d{2}/\\d{2}/\\d{4}$")) {
-                    JOptionPane.showMessageDialog(btnCreateAccount, "Birthday must be in MM/DD/YYYY format.");
-                    return;
-                }
-
+            // Para sure kung hindi sobra or kulang yung numbers sa birthday
+            if (!birthdayFormat.matches("^\\d{2}/\\d{2}/\\d{4}$")) {
+                JOptionPane.showMessageDialog(btnCreateAccount, "Birthday must be in MM/DD/YYYY format.");
+                return;
+            }
 
             // Para sure kung numeric format yung nilagay sa birthday
             LocalDate birthday;
@@ -216,28 +225,26 @@ public class frameRegistration extends JFrame implements ActionListener, sqlInfo
                 return;
             }
 
+            // Para sure kung legal age na
+            LocalDate present = LocalDate.now();
+            int age = present.getYear() - birthday.getYear();
 
-                // Para sure kung legal age na
-                LocalDate present = LocalDate.now();
-                int age = present.getYear() - birthday.getYear();
+            if (age < 18) {
+                JOptionPane.showMessageDialog(btnCreateAccount, "You are not yet in legal age to register.");
+                return;
+            }
 
-                if (age < 18) {
-                    JOptionPane.showMessageDialog(btnCreateAccount, "You are not yet in legal age to register.");
-                    return;
-                }
-
-                // Confirm Password
-                if (!password.equals(conPassword)) {
-                    JOptionPane.showMessageDialog(btnCreateAccount, "Passwords do not match.");
-                    return;
-                }
-                
-
-                
-                voter.addVoter(idGen.idGenerator("dbvotingsystem", "voters", "voterID"), email, firstName, middleName, lastName, birthdayFormat, gender, password);
-                JOptionPane.showMessageDialog(null, "Account Successfully Created.", "Account Creation",JOptionPane.INFORMATION_MESSAGE);
-                new frameLogin().setVisible(true);
-                dispose();
+            // Confirm Password
+            if (!password.equals(conPassword)) {
+                JOptionPane.showMessageDialog(btnCreateAccount, "Passwords do not match.");
+                return;
+            }
+            
+            //add the voter along with their info 
+            voter.addVoter(idGen.idGenerator("dbvotingsystem", "voters", "voterID"), email, firstName, middleName, lastName, birthdayFormat, gender, password);
+            JOptionPane.showMessageDialog(null, "Account Successfully Created.", "Account Creation",JOptionPane.INFORMATION_MESSAGE);
+            new frameLogin().setVisible(true);
+            dispose();
         }
         else if(e.getSource()==btnBack){
             new frameLogin().setVisible(true);

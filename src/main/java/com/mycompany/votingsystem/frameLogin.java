@@ -1,23 +1,21 @@
 package com.mycompany.votingsystem;
 
 //Aiello Gabriel B. Lastrella
-
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
 public class frameLogin extends JFrame implements ActionListener {
 
     // for GUI
-    private JLabel lblLogo, lblCOE, lblOrg,lblEmail, lblPassword;
-    private JTextField txtEmail;
-    private JPasswordField txtPassword;
-    private JButton btnLogin, btnRegister;
+    private final JLabel lblLogo, lblCOE, lblOrg,lblEmail, lblPassword;
+    private final JTextField txtEmail;
+    private final JPasswordField txtPassword;
+    private final JButton btnLogin, btnRegister;
 
-    private TimeFuncElection time = new TimeFuncElection();
-    private Voter voter = new Voter();
+    private final TimeFuncElection time = new TimeFuncElection();
+    private final Voter voter = new Voter();
 
     frameLogin() {
         
@@ -101,26 +99,28 @@ public class frameLogin extends JFrame implements ActionListener {
                 dispose();
              
             // FOR USERS: retirve data sa hash table then will be redirected to either frameVoting/Waiting depending on set schedule  
-            } else if (frameRegistration.retrieve_HT().containsKey(email) &&
-                       frameRegistration.retrieve_HT().get(email).equals(password)) {
-                       JOptionPane.showMessageDialog(btnLogin, "Login successful!", "Hash Table", JOptionPane.INFORMATION_MESSAGE);
-                    
-                        //Checks whether the current time is within the set Election time
-                        if(time.isWithinTime()){
-                            dispose();
-                            new frameVoting().setVisible(true);
-                        }
-                        else if(time.isAfterTime()){
-                            dispose();
-                            JOptionPane.showMessageDialog(null, "Insert Analytics here", "womp womp",JOptionPane.ERROR_MESSAGE);
-                            new frameLogin().setVisible(true);
-                        }
-                        else{
-                            dispose();
-                            new frameWaitingPage().setVisible(true);
-                        }
-                        dispose();
-                    
+            } else if (frameRegistration.retrieve_HT().containsKey(email) && frameRegistration.retrieve_HT().get(email).equals(password)) {
+                JOptionPane.showMessageDialog(btnLogin, "Login successful!", "Hash Table", JOptionPane.INFORMATION_MESSAGE);
+                Voter _voter = new Voter(email);
+                //Checks whether the current time is within the set Election time
+                if(time.isWithinTime()){
+                    if (_voter.isVoted){
+                        JOptionPane.showMessageDialog(null,"You Alread Voted! Wait For Result On: " + time.getElectionEndTime());
+                        txtEmail.setText("");
+                        txtPassword.setText("");
+                        return;
+                    }
+                    dispose();
+                    new frameVoting(_voter).setVisible(true);
+                }
+                else if(time.isAfterTime()){
+                    dispose();
+                    new frameAnalytics().setVisible(true);
+                }
+                else{
+                    dispose();
+                    new frameWaitingPage().setVisible(true);
+                }    
             } else {
                 JOptionPane.showMessageDialog(btnLogin, "Email and Password must be correct.", "Error", JOptionPane.ERROR_MESSAGE);  
             }

@@ -1,7 +1,5 @@
 package com.mycompany.votingsystem;
 
-
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,21 +9,20 @@ import java.time.format.DateTimeFormatter;
 import javax.swing.*;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
-public class frameAdminAccess extends JFrame implements ActionListener {
+public final class frameAdminAccess extends JFrame implements ActionListener {
             
-        private JTextArea txtaSummary;
-        private JLabel hdrAdmin,hdrAdd,hdrRemove,lblAddName,lblAddParty,lblAddPosition,
+        private final JTextArea txtaSummary;
+        private final JLabel hdrAdmin,hdrAdd,hdrRemove,lblAddName,lblAddParty,lblAddPosition,
                 lblRemoveID,hdrElectionDate,lblStartElection,lblEndElection,lblTimeForm,lblDateForm;
-        private JComboBox cmbAddPosition;
-        private String []position = {"Select Position:","President","Vice President","Senator"} ;
-        private JTextField txtfAddName,txtfAddParty,txtfRemoveID,txtfRemoveName,txtfRemovePosition,txtfRemoveParty,
+        private final JComboBox cmbAddPosition;
+        private final String []position = {"Select Position:","President","Vice President","Senator"} ;
+        private final JTextField txtfAddName,txtfAddParty,txtfRemoveID,txtfRemoveName,txtfRemovePosition,txtfRemoveParty,
                 txtfDateStartElection,txtfDateEndElection, txtfTimeStartElection,txtfTimeEndElection;
-        private JButton btnAddCandidate, btnClearCandidate,btnRemoveCandidate,btnSearchCandidate,
+        private final JButton btnAddCandidate, btnClearCandidate,btnRemoveCandidate,btnSearchCandidate,
                 btnSetElection,btnForceEndElection,btnCurrentTime,btnSignOut;
-        private JScrollPane spSummary;
-        private boolean ElectionOn = false;
-        private Candidate candidate = new Candidate();
-        private TimeFuncElection timec = new TimeFuncElection();
+        private final JScrollPane spSummary;
+        private final Candidate candidate = new Candidate();
+        private final TimeFuncElection timec = new TimeFuncElection();
     
     frameAdminAccess(){
         
@@ -40,7 +37,6 @@ public class frameAdminAccess extends JFrame implements ActionListener {
         hdrAdmin.setFont(new Font("Helvetica", Font.BOLD, 25));
         add(hdrAdmin);
         
-//Add Candidate Function
         hdrAdd = new JLabel("Add Candidate");
         hdrAdd.setBounds(20,30,150,50);
         hdrAdd.setFont(new Font("Arial", Font.ITALIC, 18));
@@ -80,7 +76,6 @@ public class frameAdminAccess extends JFrame implements ActionListener {
         //btnClearCandidate.setBounds(20, 225, 75, 30);
         add(btnClearCandidate);
 
-//Remove Candidate Function
         hdrRemove = new JLabel("Remove Candidate");
         hdrRemove.setBounds(20,250,200,50);
         hdrRemove.setFont(new Font("Arial", Font.ITALIC, 18));
@@ -150,11 +145,9 @@ public class frameAdminAccess extends JFrame implements ActionListener {
         txtfDateStartElection.setBounds(125,465,80,30);
         add(txtfDateStartElection);
         
-       txtfTimeStartElection = new JTextField();
+        txtfTimeStartElection = new JTextField();
         txtfTimeStartElection.setBounds(225,465,80,30);
         add(txtfTimeStartElection);
-
-
 
         //End Election        
          lblEndElection = new JLabel("End of Election: ");
@@ -197,7 +190,6 @@ public class frameAdminAccess extends JFrame implements ActionListener {
         
         updateSummaryTextField();
         
-//        setTimeElection setTime = new setTimeElection();
     }
 
     @Override
@@ -206,7 +198,9 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                 if (((txtfAddName.getText() == null || "".equals(txtfAddParty.getText().trim())) || "".equals(txtfAddName.getText().trim())) || txtfAddParty.getText()==null ){
                     JOptionPane.showMessageDialog(null, "Candidate Information is required.", "Error", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    if (cmbAddPosition.getSelectedIndex() != 0){
+                    if (cmbAddPosition.getSelectedIndex() == 0){
+                        JOptionPane.showMessageDialog(null, "Select necessary position.", "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
                         String name = txtfAddName.getText();
                         String party = txtfAddParty.getText();
                         String candidatePosition = (String)cmbAddPosition.getSelectedItem();
@@ -215,8 +209,6 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                         txtfAddParty.setText("");
                         cmbAddPosition.setSelectedIndex(0);
                         updateSummaryTextField();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Select necessary position.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
         }
@@ -248,7 +240,7 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                     JOptionPane.showMessageDialog(null, "Input ID First");  
                 }
         }
-        
+        //Triggers to remove the inserted candidate on the database
         else if (e.getSource() == btnRemoveCandidate){
                 if (!txtfRemoveID.getText().equals("")){  
                     try{
@@ -259,17 +251,17 @@ public class frameAdminAccess extends JFrame implements ActionListener {
                         candidate.deleteCandidate(ID);
                         txtfRemoveID.setText("");
                         updateSummaryTextField();    
-                }catch(NumberFormatException ex){
-                    txtfRemoveID.setText("");
-                    //Error Message if the Format of the ID is Invalid
-                    JOptionPane.showMessageDialog(null, "Invalid ID");   
-                }  
+                    }catch(NumberFormatException ex){
+                        txtfRemoveID.setText("");
+                        //Error Message if the Format of the ID is Invalid
+                        JOptionPane.showMessageDialog(null, "Invalid ID");   
+                    }  
                 } else{
                     JOptionPane.showMessageDialog(null, "Enter ID First");
                     txtfRemoveID.setText("");
                 }
         }
-      
+        //Outout the current time
         else if (e.getSource() == btnCurrentTime){
                 LocalDate currDate = LocalDate.now();
                 String formattedCurrDate = currDate.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
@@ -314,7 +306,9 @@ public class frameAdminAccess extends JFrame implements ActionListener {
         txtaSummary.setText("President \n \n");
         txtaSummary.append(candidate.listOfAllCandidatesInString("President") + "\n");
         txtaSummary.append("Vice President \n \n");
-        txtaSummary.append(candidate.listOfAllCandidatesInString("Vice President"));      
+        txtaSummary.append(candidate.listOfAllCandidatesInString("Vice President") + " \n");
+        txtaSummary.append("Senators \n \n");
+        txtaSummary.append(candidate.listOfAllCandidatesInString("Senator"));   
     }
       
 }

@@ -10,8 +10,8 @@ import javax.swing.SwingConstants;
 
 public class frameWaitingPage extends JFrame implements ActionListener{
 
-    private JLabel hdrClosed,lblInfo;
-    private JButton btnSignOut;
+    private final JLabel hdrClosed,lblInfo;
+    private final JButton btnSignOut;
     
     public frameWaitingPage() {
         setSize(800,600);
@@ -43,7 +43,7 @@ public class frameWaitingPage extends JFrame implements ActionListener{
         
     if(e.getSource()==btnSignOut){
         dispose();
-        new frameLogin();
+        new frameLogin().setVisible(true);
     }
         
     }

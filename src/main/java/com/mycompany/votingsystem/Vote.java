@@ -14,8 +14,6 @@ import javax.swing.JOptionPane;
 public class Vote implements sqlInfo {
     int voterID, candidateID, voteID;
     
-
-    
     Vote(){};
     
     //use to access a vote informations using the voteID
@@ -38,7 +36,7 @@ public class Vote implements sqlInfo {
     
     
     // use to register or add vote to the database
-    Vote(int voteID, int voterID, int candidateID){
+    void addVote(int voteID, int voterID, int candidateID){
         try {
             String query = "insert into dbvotingsystem.vote(voteID,voterID,candidateID) VALUES (?,?,?)";
             Class.forName("com.mysql.cj.jdbc.Driver");

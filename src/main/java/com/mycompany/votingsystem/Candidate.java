@@ -1,6 +1,5 @@
 package com.mycompany.votingsystem;
 
-import com.mycompany.votingsystem.idGenerator;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -104,7 +103,7 @@ public class Candidate  implements sqlInfo{
             while (rs.next()){
                 int ID = rs.getInt(1);
                 Candidate candidate = new Candidate(ID);
-                names += ID +" - " +candidate.name+"\t \t" +candidate.partylist + "\n";
+                names += ID +" - " +candidate.name+" (" +candidate.partylist + ") \n";
             }   
             return names;  
         } catch (ClassNotFoundException | SQLException ex) {
