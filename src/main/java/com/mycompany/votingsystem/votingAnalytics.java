@@ -29,7 +29,8 @@ public final class votingAnalytics implements sqlInfo{
     int totalSenatorVotes = 0;
     private final Voter voter = new Voter();
     private final Candidate candidate = new Candidate();
-
+    private final quickSort qSort = new quickSort();
+    
     votingAnalytics() {
        
         graph = new Graph();
@@ -74,38 +75,15 @@ public final class votingAnalytics implements sqlInfo{
         return candidateStats;
     }
     
+//    Function that sorts the Hashmap of candidates' votes
     HashMap<Integer,Integer> sortedCandidatesByVote(String Position){
         HashMap<Integer,Integer> hmCandidates = new HashMap<>();
         for (int candidateIDs : candidate.listOfAllCandidates(Position)){
             hmCandidates.put( candidateIDs,graph.graph.get(candidateIDs).vertex.size()); 
         }
         
-        HashMap <Integer, Integer> sortedCandidates = sortByValue(hmCandidates);     
+        HashMap <Integer, Integer> sortedCandidates = qSort.sortByV(hmCandidates);     
         return sortedCandidates;
-    }
-    
-    HashMap<Integer, Integer> sortByValue(HashMap<Integer, Integer> hm)
-    {
-        // Create a list from elements of HashMap
-        List<Map.Entry<Integer, Integer> > list =
-               new LinkedList< >(hm.entrySet());
- 
-        // Sort the list
-        Collections.sort(list, new Comparator<Map.Entry<Integer, Integer> >() {
-            @Override
-            public int compare(Map.Entry<Integer, Integer> o2, 
-                               Map.Entry<Integer, Integer> o1)
-            {
-                return (o1.getValue()).compareTo(o2.getValue());
-            }
-        });
-         
-        // put data from sorted list to hashmap 
-        HashMap<Integer, Integer> temp = new LinkedHashMap<>();
-        for (Map.Entry<Integer, Integer> aa : list) {
-            temp.put(aa.getKey(), aa.getValue());
-        }
-        return temp;
     }
     
         //Function that returns the generation range of a candidate
@@ -131,10 +109,8 @@ public final class votingAnalytics implements sqlInfo{
         }
     }
     
-        /*
-            Add all the voterID of voters to their respective candidates in the graph
-            while counting the numbers of voters voted in different positions
-        */
+        /*Add all the voterID of voters to their respective candidates in the graph
+            while counting the numbers of voters voted in different positions*/
     void addAllVoter() {
         try {      
             Class.forName("com.mysql.cj.jdbc.Driver");

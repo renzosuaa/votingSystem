@@ -2,6 +2,7 @@ package com.mycompany.votingsystem;
 
 import java.text.DecimalFormat;
 
+//Generates a percentage string from int values
 public class percentage {
     
     private float percent;
