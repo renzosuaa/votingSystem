@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//Generates ID numbers for voters, candidates and votes
+//Generates ID numbers for voters, candidates and votes by incrementing the highest exisiting ID on the table if not a negative number
 public class idGenerator implements sqlInfo{
             
     int idGenerator(String schema, String table, String IDType) {

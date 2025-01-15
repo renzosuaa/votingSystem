@@ -119,12 +119,13 @@ public final class frameVoting extends JFrame implements ActionListener {
         LinkedList <Integer> candidates = new LinkedList(candidate.listOfAllCandidates(position));
         
         for (int candidateIDs: candidates){
-            addCandidates(new Candidate(candidateIDs).name, position);
+            Candidate _candidate = new Candidate(candidateIDs);
+            addCandidates(_candidate.name, position, _candidate.partylist);
         }
     }
 
     // Method to add a candidate to the platform
-    public void addCandidates(String name, String position) {
+    public void addCandidates(String name, String position, String partylist) {
         String candidateName = name;
 
         // Create a panel to hold the name and button (Radio or Checkboxes)
@@ -133,16 +134,19 @@ public final class frameVoting extends JFrame implements ActionListener {
 
         if (position.equalsIgnoreCase("President")) {
             JRadioButton radioButton = new JRadioButton(candidateName);
+            radioButton.setToolTipText("PARTYLIST: "+partylist);
             presidentGroup.add(radioButton);
             candidatePanel.add(radioButton);
             presidentPanel.add(candidatePanel);
         } else if (position.equalsIgnoreCase("Vice President")) {
             JRadioButton radioButton = new JRadioButton(candidateName);
+            radioButton.setToolTipText("PARTYLIST: "+partylist);
             vicePresidentGroup.add(radioButton);
             candidatePanel.add(radioButton);
             vicePresidentPanel.add(candidatePanel);
         } else if (position.equalsIgnoreCase("Senator")) {
             JCheckBox checkBox = new JCheckBox(candidateName);
+           checkBox.setToolTipText("PARTYLIST: "+partylist);
             checkBox.addItemListener(e -> handleSenatorSelection(checkBox));
             senatorCheckBoxes.add(checkBox);
             candidatePanel.add(checkBox);
