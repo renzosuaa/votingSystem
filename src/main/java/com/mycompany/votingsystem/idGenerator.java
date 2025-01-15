@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
+//Generates ID numbers for voters, candidates and votes
 public class idGenerator implements sqlInfo{
             
     int idGenerator(String schema, String table, String IDType) {
@@ -16,7 +16,6 @@ public class idGenerator implements sqlInfo{
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con=DriverManager.getConnection(URL,USER,PASSWORD);
-            //Make a SQL query to display the current largest ID number
             String query = "select "+ IDType+" from "+ schema +"."+table+" order by "+ IDType +" desc limit 1";
             PreparedStatement ps = con.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
